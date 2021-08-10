@@ -1,0 +1,21 @@
+<!-- Emmet Shorcuts -->
+<!--    For Comment Ctrl + /    -->
+<!-- span.class1.class2 -->
+<span class="class1 class2"></span>
+
+<!-- p.class1.class2*5 -->
+<p class="class1 class2"></p>
+<p class="class1 class2"></p>
+<p class="class1 class2"></p>
+<p class="class1 class2"></p>
+<p class="class1 class2"></p>
+
+<!-- .class1.class2 -->
+division tag is default for Emmet in class
+<div class="class2 class2"></div>
+
+span#id
+<span id="id"></span>
+
+  <!-- Lorem Example<p>lorem40</p> -->
+
