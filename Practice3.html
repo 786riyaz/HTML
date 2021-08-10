@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Form Tag        Input Tag       Other Form Related Controllers -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice 3 - RK</title>
+</head>
+
+<body>
+    <center>
+        <h2>Admission Form</h2>
+        <form action="Backend.php" method="get">
+            <div>
+                <label for="name">Name:</label>
+                <!-- if of controller should be provided in for attribute of label -->
+                <input type="text" name="inpName" id="name">
+                <!-- INPUT TYPE can be text number email date datetime radio checkbox submit reset -->
+            </div>
+            <div>
+                Mobile:
+                <input type="number" name="inpMobile" id="mobile">
+            </div>
+            <Div>
+                dob:
+                <input type="date" name="inpDOB" id="dob">
+            </Div>
+            <div>
+                joining date and time:
+                <input type="datetime" name="inpJoinDate" id="joinDate">
+            </div>
+            <div>
+                Email:
+                <input type="email" name="inpEmail" id="email">
+            </div>
+            <div>
+                Address:
+                <!-- TextArea has coulmns and rows -->
+                <textarea name="inpAddress" cols="20" rows="5">Type Your address Here</textarea>
+            </div>
+            <div>
+                Gender:
+                Male<input type="radio" name="inpGender" id="gender" checked>
+                Female<input type="radio" name="inpGender" id="gender">
+            </div>
+            <div>
+                Language:
+                English
+                <input type="checkbox" name="inpLang" id="language" checked>
+                Hindi
+                <input type="checkbox" name="inpLang" id="language">
+                Gujarati
+                <input type="checkbox" name="inpLang" id="language">
+            </div>
+            <div>
+                <label for="cast">Cast:</label>
+                <!-- Select is used for drop down and has OPTION for different options -->
+                <select name="inpCast" id="cast">
+                    <option value="open" selected>General</option>
+                    <option value="obc">OBC</option>
+                    <option value="st">ST</option>
+                </select>
+            </div>
+
+
+            <div>
+                <br>
+                <input type="submit" value="Submit">
+                <input type="reset" value="Reset">
+            </div>
+        </form>
+    </center>
+</body>
+
+</html>
