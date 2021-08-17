@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- HTML-Entities -->
+<!-- HTML-Entities      &       JavaScript Basic -->
 
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Practice 4 - RK</title>
+    <script src="Practice4.js"></script><!-- external JavaScript link is here -->
 </head>
 
 <body style="font-size:100%;">
     <!--This is inline css  -->
+
+    <h3 id="changeThis">This data will be changed by JS</h3>
     blank space = &nbsp;<br>
     less than = &lt;<br>
     greater than = &gt;<br>
@@ -27,6 +30,16 @@
     Yen = &yen;<br>
     Euro = &euro;<br>
     Register trademark = &reg;<br>
+    <script>
+        // internal JavaScript is here
+        console.log("This line is from internal script tag inside body")
+    </script>
 </body>
+<script>
+    // internal JavaScript is here
+    console.log("This line is from internal script tag out side body");
+    document.getElementById('changeThis').innerHTML = 'This data is from JS';
+    // not working in extrenal JS
+</script>
 
 </html>

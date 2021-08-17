@@ -1,0 +1,67 @@
+/* Cascading style Sheet is used to separate the designing from content */
+/* Selector { Proprty : Value;} */
+*{
+    margin:5px;
+    padding: 5px;
+    align-items: center;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+/* element selector */
+h2{
+    font-style:normal;
+    font-size:32px;
+    border-radius: 10px;
+    background-color: red;
+    border:5px solid black;
+}
+input{
+    /* background-color: black; */
+    border:none;
+    border-bottom:2px solid black;
+    color: red;
+}
+/* input[type=submit],input[type=reset]{
+    border:none;
+} */
+
+/* psuedo selector */
+input:hover{
+    background-color: gray;
+    color:white;
+}
+/* 
+input[type=submit],input[type=reset]:hover{
+    background-color: red; 
+    color:white;
+    border:none; 
+} */
+/* class selector */
+input.btn{
+    border:2px solid red;
+    border-radius: 20px;
+}
+
+/* id selector */
+#cast{
+    /* background-color: black; */
+    border:none;
+    color:red;
+}
+/*
+textarea{
+     visibility: hidden; 
+     display:none; 
+}*/
+
+
+/* 
+Another Topic in CSS--------------------------
+media query
+keyframe
+animation
+transform
+flexbox
+grid
+nth child
+ */

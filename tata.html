@@ -1,0 +1,1490 @@
+<!-- This is campaign create lead HTML 
+IBL CIF CAMPAIGN : Added new div having input fields required to call IBL CIF services
+	 10/11/2020 :: Sumit Jungi :: TAAI-6504 : Aadhaar Based KYC spell related change.
+	 21/11/2020 :: Sumit Jungi :: OKYC : adhoc : TAAI-7556,TAAI-6273 related changes.
+	 30/11/2020 :: Sumit Jungi :: TAAI-7585 : okyc question change
+	 31/12/2020 :: Sumit Jungi :: okyc CR : okyc question change and new msg added 
+	 05/02/2020 :: Sumit Jungi :: TAAI-8288 : ad-hoc
+	 07-06-2021 :: Dharmang Gajjar :: Country CR - Added Country of Residence field and Country field to show India option
+-->
+<header-component customer-info="cdc.customerInfo"></header-component>
+<div id="otpIBLCIF" class="dn">
+    <div class="popup_cont col-lg-12">
+       <!-- OTP -->
+        <div class="popup_form_cont otp mr">
+        	<form name="cdc.otpform" novalidate>
+            <h2>We would like to confirm your details</h2>
+            <div class="otp-forms mr">
+                <div class="col-lg-12">
+                     <h5>An OTP has been sent to your registered mobile number <strong>{{cdc.otpNumberDisplay}}</strong> at {{cdc.OTPSENDTIME}} 
+                     and this verification code will be used as consent for asking your personal information from IndusInd bank for the purpose of 
+                     completion of your insurance application with TATA AIA Life Insurance.</h5>
+
+                    <div class="smart-wrap pr">
+                        <input data-skip-cobrowse class="full-width inputText" ng-maxlength="4" ng-minlength="4" type="text" name="otp" ng-model="cdc.otp" required/>
+                        <span class="floating-label">{{cdc.otpLabel}}<em>*</em></span>
+                        <div ng-messages="cdc.otpform.otp.$error" class="error-messages" ng-show="cdc.otpform.otp.$invalid && !cdc.otpform.otp.$pristine">
+                             <div ng-message="required">Please Enter OTP</div>
+                             <div ng-message="maxlength">Maximum 4 char only.</div>
+                             <div ng-message="minlength">Minimum 4 char only.</div>
+                         </div>
+                    </div>
+                    <input class=" blkbtn" type="button" value="Validate" ng-click="cdc.validateOtpCIF()" />
+                    <p class="margin-bottom-5 margin-top-20">{{counter==0?"":"If you donâ€™t receive an OTP, kindly retry in 00:"+counter}} </p>
+                    <a class="btn_otp refresh-img" ng-click="enableresendotp || cdc.sendOtpCIF()">Resend OTP</a>
+                </div>
+            </div>
+        	</form>
+        </div>
+    </div>
+</div>
+<div id="disclaimer" ng-show="cdc.showdisclaimer">
+	<div class="popup_cont col-lg-12">
+		<div class="popup_form_cont disclaimer mr">
+			<form name="cdc.disclaimerform" novalidate>
+				<h2>Disclaimer</h2>
+				<div class="disclaimerForm form-wrap">
+					<div class="col-lg-12 col-sm-12 col-xs-12">
+						<h5 class="bold">I hereby declare that:</h5>
+						<p class="margin-bottom-5 margin-top-20">
+							<input type="checkbox" name="agree" id="agree" name="agree" value="Y" required ng-model="cdc.disclaimerData.agree"><label for="agree"><span class="check sprite"></span></label> I am purchasing the TATA AIA product on my own.
+						</p>
+						<div class="clear"></div>
+						<div ng-messages="cdc.disclaimerform.agree.$error" class="error-messages" ng-show="invaliddisclaimer || (cdc.disclaimerform.agree.$invalid && !cdc.disclaimerform.agree.$pristine)">
+							<div ng-message="required">Please select disclaimer</div>
+						</div>
+						<div class="clear"></div>
+						<p class="margin-bottom-5 margin-top-20">
+							<input type="checkbox" name="agree1" id="agree1" value="Y" required ng-model="cdc.disclaimerData.agree1"><label for="agree1"><span class="check sprite"></span></label> I am authorizing DBS bank to share my KYC & AML documents for the purpose of completion of this application.
+						</p>
+						<div ng-messages="cdc.disclaimerform.agree1.$error" class="error-messages" ng-show="invaliddisclaimer || (cdc.disclaimerform.agree1.$invalid && !cdc.disclaimerform.agree1.$pristine)">
+							<div ng-message="required">Please select disclaimer</div>
+						</div>
+						<div class="clear"></div>
+					</div>
+					<div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12">
+						<div class="smart-wrap pr">
+							<input class="full-width inputText" type="number" ng-maxlength="12" ng-minlength="12" ng-required='isDBS_POSSIP || cdc.DBAB1' ng-model="cdc.disclaimerData.ACCOUNT_NO" id="accountnumber" name="accountnumber" /> <span class="floating-label">DBS Account Number</span>
+							<div class="clear"></div>
+							<!-- 11-04-2019 :: Mangesh Katkar :: DBS changes -->
+							<div ng-messages="cdc.disclaimerform.accountnumber.$error" class="error-messages" ng-show="(cdc.disclaimerform.accountnumber.$invalid && !cdc.disclaimerform.accountnumber.$pristine) || invaliddisclaimer">
+								<div ng-message="maxlength">Enter valid account number.</div>
+								<div ng-message="minlength">Enter valid account number.</div>
+								<div ng-message="required">Please enter your account number.</div>
+							</div>
+						</div>
+					</div>
+					<div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12">
+						<div class="smart-wrap pr">
+							<input class="full-width inputText" type="text" name="reference" id="reference" ng-maxlength="20" ng-required='isDBS_POSSIP' ng-model="cdc.disclaimerData.REFERENCE_CODE" ng-pattern="cdc.agentCodeRegex" ng-change="cdc.resetvalidation()" />
+							<!-- <span class="floating-label">Document Code<em>*</em></span> -->
+							<div class="clear"></div>
+							<div ng-messages="cdc.disclaimerform.reference.$error" class="error-messages" ng-show="invaliddisclaimer || (cdc.disclaimerform.reference.$invalid && !cdc.disclaimerform.reference.$pristine)">
+								<div ng-message="required">Please Enter Valid SP Code.</div>
+								<div ng-message="pattern">Please enter a valid Document code (Do not prepend zero).</div>
+								<div ng-message="maxlength">Maximum 20 characters only.</div>
+							</div>
+						</div>
+						<div class="col-lg-12 col-sm-12 col-xs-12" ng-if='isDBS_POSSIP'>
+							<input class="blkbtn" id="getAgentData" name="getAgentData" ng-click="cdc.getAgentData()" ng-disabled="cdc.disclaimerform.reference.$invalid || cdc.agentvalidated" type="submit" value="Validate" />
+							<span class="agentvalidate" ng-class="cdc.agentvalidated ? 'circle-green' : 'circle-grey'"><i class="fa fa-check"></i></span>
+						</div>
+
+					</div>
+					<div class="col-lg-12 col-sm-12 col-xs-12">
+						<input class=" blkbtn" id="disclaimerformsubmit" name="disclaimerformsubmit" type="submit" value="Agree & Proceed" ng-click="cdc.disclaimerSubmit(cdc.disclaimerform)" />
+					</div>
+				</div>
+				<p>&nbsp;</p>
+				<!-- <div class="col-lg-12 disclaimer-page form-wrap">
+					<p>Insurance is the subject matter of the solicitation
+             			<br> These products are underwritten by Tata AIA Life Insurance Company Limited
+             			<br> For more details on risk factors, terms and conditions please read sales brochure carefully before concluding a sale Tax benefits are as per Income Tax Act, 1961, and are subject to modifications made thereto from time to time. Please consult your own tax consultant to know the tax benefit available to you.
+             			<br> Insurance cover is available under these products.
+             			<br> Riders are not mandatory and are available for a nominal extra cost
+             			<br> Service tax and TDS are applicable as per governing laws. Tata AIA Life Insurance Company Limited reserves the right to recover / deduct from the policyholder, and levies and duties (including service tax and TDS), as imposed by the government from time to time. Kindly refer the sales illustration for the exact premium.
+             			<br> You can opt for Combo Solutions or Individual products as per requirements.</p>
+         				<p>Beware of Spurious Phone calls and Fictitious/Fradulent offers. IRDA of India clarifies to public that IRDA of india or its officials do not involve in activities like sale of any kind of insurance or financial products nor invest premiums.</p>
+         				<p>IRDA of India does not announce any bonus. Public receiving such phone calls are requested to lodge a police complaint along with details of phone call, number.</p>
+         				<h4 class="h4-label" style="margin-bottom: 0;"><strong>Products</strong></h4>
+		            <div class="row">
+		              <div class="container">
+		                <div class="col-lg-4 col-md-6 col-xs-12 col-sm-12 table-text">Tata AIA Life Insurance Gold Income Plan</div>
+		                <div class="col-lg-6 col-md-6 col-xs-12 col-sm-12 table-text">-UIN : 110N131V01 (Gold Income Plan)</div>
+		                <div class="col-lg-4 col-md-6 col-xs-12 col-sm-12 table-text">Tata AIA Life Insurance Fortune Pro</div>
+		                <div class="col-lg-6 col-md-6 col-xs-12 col-sm-12 table-text">-UIN : 110L112V02 (Fortune Pro)</div>
+		              </div>
+		            </div>
+		            <h4>&nbsp;</h4>
+				</div> -->
+				<ul class="starbull">
+					<li>Insurance cover is available under this product</li>
+					<li>Riders are not mandatory and is available for a nominal extra cost. For more details on benefits, premiums and exclusions under the Riders, please contact Tata AIA Life's Insurance Advisor/ branch</li>
+					<li>This product is underwritten by Tata AIA Life Insurance Company Ltd. This plan is not a guaranteed issuance plan and it will be subject to Company's underwriting and acceptance.</li>
+					<li>Buying a Life Insurance policy is a long-term commitment. An early termination of the policy usually involves high costs and the Surrender Value payable may be less than all the Premiums Paid.</li>
+					<li>In case of Sub Standard lives, extra premiums will be charged as per our underwriting guidelines</li>
+					<li>Income Tax benefits would be available as per the prevailing income tax laws, subject to fulfillment of conditions stipulated therein. Tata AIA Life Insurance Company Ltd. does not assume responsibility on tax implication mentioned anywhere on this site. Please consult your own tax consultant to know the tax benefits available to you.</li>
+					<li>For more details on risk factors, terms and conditions please read sales brochure carefully before concluding a sale</li>
+				</ul>
+				<p>
+					For any information including cancellation, claims and complaints, please contact our Insurance Advisor or visit Tata AIA Life's nearest branch office or call 1-860-266-9966 (local charges apply) or write to us at <a href="mailto:customercare@tataaia.com">customercare@tataaia.com</a>.
+				</p>
+				<p>Tata AIA Life Insurance Company Ltd. (IRDA of India Regn. No.110) CIN No. U66010MH2000PLC128403 Registered & Corporate Office: 14th Floor, Tower A, Peninsula Business Park, Senapati Bapat Marg, Lower Parel, Mumbai - 400013</p>
+				<div class="disc_box_cont">
+					<h4>BEWARE OF SPURIOUS PHONE CALLS AND FICTITIOUS/FRAUDULENT OFFERS</h4>
+					<p>IRDA of India clarifies to public that</p>
+					<ul>
+						<li>IRDA of India or its officials do not involve in activities like sale of any kind of insurance or financial products nor invest premiums.</li>
+						<li>IRDA of India does not announce any bonus. Public receiving such phone calls are requested to lodge a police complaint along with details of phone call, number.</li>
+					</ul>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<!-- GC code starts  -->
+<div id="disclaimerGC" ng-show="cdc.showdisclaimerGC">
+	<div class="popup_cont col-lg-12">
+		<div class="popup_form_cont disclaimer mr">
+			<form name="cdc.disclaimerformGC" novalidate>
+				<h2>Authentication</h2>
+				<div class="disclaimerForm form-wrap">
+					<!-- /*GC CR Start*/ -->
+					<!-- <div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12">
+						<div class="smart-wrap pr">
+							<input class="full-width inputText" type="text" ng-model="cdc.GCPASA.EMPLOYEE_ID" name="employeeid" required/><span class="floating-label">Employee ID<em>*</em></span>
+							<div class="clear"></div>
+							<div ng-messages="cdc.disclaimerformGC.employeeid.$error" class="error-messages" ng-show="cdc.disclaimerformGC.employeeid.$invalid && (!cdc.disclaimerformGC.employeeid.$pristine || cdc.GCsubmit)">
+								<div ng-message="required">Please enter Employee ID.</div>
+							</div>
+						</div>
+					</div> -->
+					<div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12">
+						<div class="selectwrap">
+							<select class="sel-opt" ng-options="option.VALUE as option.DISPLAY for option in cdc.IncomeBandList" ng-model="cdc.GCPASA.INCOME_BAND" name="incomeband" id="incomeband" required > </select><span class="floating-label">Income Band<em>*</em></span>
+							<div class="clear"></div>
+							<div ng-messages="cdc.disclaimerformGC.incomeband.$error" class="error-messages" ng-show="cdc.disclaimerformGC.incomeband.$invalid && (!cdc.disclaimerformGC.incomeband.$pristine || cdc.GCsubmit)">
+								<div ng-message="required">Please enter Income Band.</div>
+							</div>
+						</div>
+					</div>
+					<div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12">
+						<div class="selectwrap">
+							<select name="gender" id="gender" class="sel-opt" ng-model="cdc.GCPASA.GENDER" required>
+								<option name="rdGender" value="M">Male</option>
+								<option name="rdGender" value="F">Female</option>
+							</select> <span class="floating-label">Gender<em>*</em></span>
+							<div ng-messages="cdc.disclaimerformGC.gender.$error" class="error-messages invalid" ng-show="cdc.disclaimerformGC.gender.$invalid && (!cdc.disclaimerformGC.gender.$pristine || cdc.GCsubmit)">
+								<div ng-message="required">Please select a gender.</div>
+							</div>
+						</div>
+					</div>
+					<!-- /*GC CR End*/ -->
+					<div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12">
+						<div class="smart-wrap pr">
+							<p class="input-group so-dt-pckr-wrapper">
+								<input name="insDob" id="insDob" type="text" placeholder="Date of Birth (DD-MM-YYYY)" class="form-control so-date-picker" uib-datepicker-popup="{{cdc.format}}" is-open="cdc.DobPopup.opened" datepicker-options="cdc.DobOptions" close-text="Close" required ng-model="cdc.GCPASA.DOB" age-less-than-18-check age-more-than-check="55" ng-paste="$event.preventDefault();" /> <span class="input-group-btn">
+									<button type="button" class="btn btn-default so-dt-pckr-btn" ng-click="cdc.openDatePicker('DobPopup')">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+							</p>
+
+							<div style="margin: 5px;">
+								<b>Date of birth format: DD-MM-YYYY</b>
+							</div>
+							<div ng-messages="cdc.disclaimerformGC.insDob.$error" class="error-messages" ng-show="cdc.disclaimerformGC.insDob.$invalid && (!cdc.disclaimerformGC.insDob.$pristine || cdc.GCsubmit)">
+								<div ng-message="required">Please select Date of Birth</div>
+								<div ng-message="date">Please enter valid Date.</div>
+								<div ng-message="minAge">Age should be at least 18 years.</div>
+								<div ng-message="maxAge">Age should be less than 55 years.</div>
+							</div>
+						</div>
+					</div>
+					<div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12">
+						<div class="smart-wrap pr">
+							<div class="selectwrap">
+									<select name="resident" id="camp-CDInsresident" class="sel-opt" required ng-options="option.RESIDENT_STATUS for option in cdc.residentStatusList" ng-model="cdc.GCPASA.resident_status">
+								</select> <span class="floating-label">Resident<em>*</em></span>
+								<div ng-messages="cdc.disclaimerformGC.resident.$error" class="error-messages" ng-show="cdc.disclaimerformGC.resident.$invalid && (!cdc.disclaimerformGC.resident.$pristine || cdc.GCsubmit)">
+									<div ng-message="required">Please select an option.</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12" ng-show="cdc.GCPASA.resident_status.RESIDENT_STATUS_CODE != 'RI'">
+						<div class="smart-wrap pr">
+							<div class="selectwrap">
+								<select name="country" id="country" class="sel-opt" select-required ng-options="option.COUNTRY_NAME for option in cdc.countryList" ng-model="cdc.GCPASA.country">
+								</select> <span class="floating-label">Country<em>*</em></span>
+								<div ng-messages="cdc.disclaimerformGC.country.$error" class="error-messages" ng-show="cdc.disclaimerformGC.country.$invalid && (!cdc.disclaimerformGC.country.$pristine || cdc.GCsubmit)">
+									<div ng-message="selectRequired">Please select an option.</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="clear"></div>
+					<div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12">
+						<div class="smart-wrap pr">
+							<input class="full-width inputText" type="text" ng-model="cdc.GCPASA.captcha" name="captcha" id="captcha" required /><span class="floating-label">Captcha<em>*</em></span>
+							<div class="clear"></div>
+							<div ng-messages="cdc.disclaimerformGC.captcha.$error" class="error-messages" ng-show="cdc.disclaimerformGC.captcha.$invalid && (!cdc.disclaimerformGC.captcha.$pristine || cdc.GCsubmit)">
+								<div ng-message="required">Please enter captcha.</div>
+							</div>
+						</div>
+					</div>
+					<div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12">
+						<div class="smart-wrap pr">
+							<input type="image" id="captchaimg" name="captchaimg" class="captchaImg" ng-src="{{cdc.captchURL}}"> <a class="refresh-img captcharefresh" ng-click="cdc.refreshCaptcha()"></a>
+						</div>
+					</div>
+					<div class="col-lg-12 col-sm-12 col-xs-12">
+						<input class=" blkbtn" name="disclaimerSubmitGC" id="disclaimerSubmitGC" type="button" value="Agree & Proceed" ng-click="cdc.disclaimerSubmitGC(cdc.disclaimerformGC)" />
+					</div>
+					<!-- /*GC CR Start*/ -->
+					<div class="col-lg-12 col-sm-12 col-xs-12">
+						<div class="disclaimer">
+							<h2 class="disclaimer-heading">Terms and Conditions</h2>
+							<div class="disclaimerForm form-wrap" align='justify' style='padding-right: 50px'>
+								<div class="col-lg-12 col-sm-12 col-xs-12">
+									<ul class="starbull" align='left' style="list-style-type: disc;">
+										<li>This offer is exclusively applicable only for TCS / Tata Group employees.</li>
+										<li>You will be required to mandatorily upload copy of Employee ID card.</li>
+										<li>Age proof and KYC (photo, ID proof and Address proof) will be required if Aadhaar-based e-KYC option is not availed.</li>
+										<li>Bank account proof like copy of cheque or bank account statement will be required as per regulations.</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- /*GC CR Start*/ -->
+				</div>
+				<p>&nbsp;</p>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div id="disclaimerGCCompany" ng-show="cdc.showdisclaimerGCCompany">
+	<div class="popup_cont col-lg-12">
+		<div class="popup_form_cont disclaimer mr">
+			<form name="cdc.disclaimerformGCCompany" novalidate>
+				<h2>Authentication</h2>
+				<div class="disclaimerForm form-wrap">
+					<div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12">
+						<div class="smart-wrap pr">
+							<div class="selectwrap">
+								<select name="companyName" id="companyName" class="sel-opt" required ng-options="option.COMPANY_NAME for option in cdc.countryList" ng-model="cdc.GCPASACompany.COMPANY_DETAIL">
+								</select> <span class="floating-label">Company Name<em>*</em></span>
+								<div ng-messages="cdc.disclaimerformGCCompany.companyName.$error" class="error-messages" ng-show="cdc.disclaimerformGCCompany.companyName.$invalid && (!cdc.disclaimerformGCCompany.companyName.$pristine || cdc.GCCompanysubmit)">
+									<div ng-message="required">Please select an option.</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-12 col-sm-12 col-xs-12">
+						<input class=" blkbtn" name="disclaimerSubmitGCCompany" id="disclaimerSubmitGCCompany" type="button" value="Agree & Proceed" ng-click="cdc.disclaimerSubmitGCCompany(cdc.disclaimerformGCCompany)" />
+					</div>
+					<div class="col-lg-12 col-sm-12 col-xs-12">
+						<div class="disclaimer">
+							<h2 class="disclaimer-heading">Terms and Conditions</h2>
+							<div class="disclaimerForm form-wrap" align='justify' style='padding-right: 50px'>
+								<div class="col-lg-12 col-sm-12 col-xs-12">
+									<ul class="starbull" align='left' style="list-style-type: disc;">
+										<li>This offer is exclusively applicable only for TCS / Tata Group employees.</li>
+										<li>You will be required to mandatorily upload copy of Employee ID card.</li>
+										<li>Age proof and KYC (photo, ID proof and Address proof) will be required if Aadhaar-based e-KYC option is not availed.</li>
+										<li>Bank account proof like copy of cheque or bank account statement will be required as per regulations.</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<p>&nbsp;</p>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div id="disclaimerGCAuth" ng-show="cdc.showdisclaimerGCAuth">
+	<div class="popup_cont col-lg-12">
+		<div class="popup_form_cont disclaimer mr">
+			<form name="cdc.disclaimerformGCAuth" novalidate>
+				<h2>Authentication</h2>
+				<div class="disclaimerForm form-wrap">
+					<!-- <div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12">
+						<div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12">
+							<div class="smart-wrap pr">
+								<input type="email" class="full-width inputText" name="email" ng-model="cdc.GCPASAEmail.EMAIL_ID" placeholder="Email" ng-pattern="cdc.emailRegex" ng-maxlength="50" required block-hash /> <span class="floating-label">Email ID<em>*</em></span>
+								<div ng-messages="cdc.disclaimerformGCAuth.email.$error" class="error-messages invalid" ng-show="cdc.disclaimerformGCAuth.email.$invalid && (!cdc.disclaimerformGCAuth.email.$pristine || cdc.GCEmailsubmit)">
+									<div ng-message="required">Email-id cannot be empty.</div>
+									<div ng-message="pattern">Please enter a valid email-id.</div>
+									<div ng-message="maxlength">Maximum 50 char only.</div>
+									<div ng-message="blockHash">Please do not use '#' or '|'.</div>
+								</div>
+							</div>
+						</div>
+						
+					</div> -->
+					<div class="col-lg-12 margin-top-20">
+						<div class="btnmargin smart-wrap pr">
+							<input class="custominput inputText" type="text" id="adhaar" name="adhaar" ng-pattern="cdc.adhaarRegex" ng-model="cdc.GCPASA.adhaar" required /> <span class="customlabel floating-label">Aadhaar number<em>*</em></span>
+							<div ng-messages="cdc.disclaimerformGCAuth.adhaar.$error" class="error-messages" ng-show="cdc.disclaimerformGCAuth.adhaar.$invalid && (!cdc.disclaimerformGCAuth.adhaar.$pristine || cdc.GCAuthsubmit)">
+								<div ng-message="pattern">Please Enter valid Aadhaar number.</div>
+								<div ng-message="required">Please Enter your Aadhaar number or Virtual ID.</div>
+							</div>
+						</div>
+						<h3 align="center">OR</h3>
+						<div class="btnmargin smart-wrap pr">
+							<input name="PanNumber" id="PanNumber" ng-model="cdc.GCPASA.PAN_CARD_NO" class="custominput inputText" type="text"  ng-minlength="10" ng-maxlength="10" ng-pattern="cdc.panRegex" required style="text-transform: uppercase" input-uppercase> <span class="customlabel floating-label">Permanent Account Number<em>*</em></span>
+							<div ng-messages="cdc.disclaimerformGCAuth.PanNumber.$error" ng-show="cdc.disclaimerformGCAuth.PanNumber.$invalid && (!cdc.disclaimerformGCAuth.PanNumber.$pristine || cdc.GCAuthsubmit)">
+								<div ng-message="required">Please enter valid PAN Card No.</div> 
+								<div ng-message="pattern">Please enter valid PAN Card No.</div> 
+								<div ng-message="minlength">Please enter valid PAN Card No.</div> 
+								<div ng-message="maxlength">Please enter valid PAN Card No.</div>
+							</div>
+							
+						</div>
+					</div>
+					<div class="col-lg-12 col-sm-12 col-xs-12 btnmargin margin-top-20">
+						<input class="blkbtn" id="disclaimerSubmitGCAuth" name="disclaimerSubmitGCAuth" type="button" value="Agree & Proceed" ng-click="cdc.disclaimerSubmitGCAuth(cdc.disclaimerformGCAuth)" />
+					</div>
+					<!-- <div class="col-lg-12 col-sm-12 col-xs-12">
+						<div class="disclaimer">
+							<h2 class="disclaimer-heading">Terms and Conditions</h2>
+							<div class="disclaimerForm form-wrap" align='justify' style='padding-right: 50px'>
+								<div class="col-lg-12 col-sm-12 col-xs-12">
+									<ul class="starbull" align='left' style="list-style-type: disc;">
+										<li>This offer is exclusively applicable only for TCS / Tata Group employees.</li>
+										<li>You will be required to mandatorily upload copy of Employee ID card.</li>
+										<li>Age proof and KYC (photo, ID proof and Address proof) will be required if Aadhaar-based e-KYC option is not availed.</li>
+										<li>Bank account proof like copy of cheque or bank account statement will be required as per regulations.</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div> -->
+
+				</div>
+				<p>&nbsp;</p>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<div id="disclaimerGCSumAssured" ng-show="cdc.showdisclaimerGCSumAssured">
+	<div class="popup_cont col-lg-12">
+		<div class="popup_form_cont disclaimer mr">
+			<form name="cdc.disclaimerGCSumAssured" novalidate>
+				<h2>Offer</h2>
+				<div class="disclaimerForm form-wrap">
+					<div class="margin-top-20 col-lg-12 col-sm-12 col-xs-12">
+						<div class="smart-wrap pr">
+							<h1>Your Maximum pre approved sum assured is {{cdc.GCPASASumAssured}}</h1>
+						</div>
+					</div>
+					<div class="clear"></div>
+					<p class="margin-bottom-5 margin-top-20">
+						<input type="checkbox" name="agreeSum" id="agreeSum" value="Y" required ng-model="cdc.disclaimerSelected"><label for="agreeSum"><span class="check sprite"></span></label> I am purchasing the TATA AIA product on my own.
+					<div ng-messages="cdc.disclaimerGCSumAssured.agreeSum.$error" class="error-messages" ng-show="cdc.disclaimerGCSumAssured.agreeSum.$invalid && (!cdc.disclaimerGCSumAssured.agreeSum.$pristine || cdc.GCSumSubmit)">
+						<div ng-message="required">Please select disclaimer</div>
+					</div>
+					</p>
+					<div class="clear"></div>
+					<div class="col-lg-12 col-sm-12 col-xs-12">
+						<input class=" blkbtn" type="button" id="disclaimerSubmitGCSumAssured" name="disclaimerSubmitGCSumAssured" value="Agree & Proceed" ng-click="cdc.disclaimerSubmitGCSumAssured(cdc.disclaimerGCSumAssured)" />
+					</div>
+				</div>
+				<p>&nbsp;</p>
+			</form>
+		</div>
+	</div>
+</div>
+<!-- GC code ends -->
+
+<div id="disclaimerSR" ng-if="cdc.showDisclaimer232">
+	<div class="popup_cont col-lg-12">
+		<div class="popup_form_cont mr">
+			<h2>Disclaimer</h2>
+			<div class="disclaimerForm form-wrap" align='justify' style='padding-right: 20px'>
+				<div class="col-lg-12 col-sm-12 col-xs-12" ng-if="cdc.BUSINESS_TYPE != cdc.COVERFOX_BUSINESS_TYPE">
+					<p>Insurance cover is available under this product. This product is underwritten by Tata AIA Life Insurance Company Ltd. This plan is not a guaranteed issuance plan and it will be subject to Company's underwriting and acceptance. In case of Sub Standard lives, extra premiums will be charged as per our underwriting Guidelines. Income Tax benefits would be available as per the prevailing income tax laws, subject to fulfillment of conditions stipulated therein. Tata AIA Life Insurance Company Ltd. does not assume responsibility on tax implication mentioned anywhere in this document. Please consult your own tax consultant to know the tax benefits available to you. For more details on risk factors, terms and conditions please read sales brochure carefully before concluding a sale.</p>
+
+					<p>HDFC Securities Limited (IRDAI Registration No: CA 0062) is the Corporate Agent of Tata AIA Life Insurance Company Limited and does not underwrite the risk or act as an insurer. HDFC Securities Limited, has its registered office at Office Floor 8, "I THINK" Building, Jolly Board Campus, Kanjurmarg (East), Mumbai - 400042. Participation by the distributor's clients in the Insurance products is purely on a voluntary basis. The contract of Insurance is between Tata AIA Life and the Insured and not between HDFC Securities and the Insured. Trade logo displayed above belongs to Tata Sons Ltd and AIA Group Ltd. and is used by Tata AIA Life Insurance Ltd under a license. Participation by the Bank's clients in the insurance products is purely on a voluntary basis. The contract of insurance is between Tata AIA Life and the insured and not between HDFC Bank and the insured.</p>
+
+					<p align='justify'>
+						For any information including cancellation, claims and complaints, please contact our Insurance advisor or visit Tata AIA Life's nearest branch office or call 1-860-266-9966 (local charges apply) or write to us at customercare@tataaia.com. Visit us at: www.tataaia.com or SMS 'LIFE' to 58888.<b> L&C/Advt/2017/Dec/480</b>
+					</p>
+
+					<address align='center' style="font-size: 14px">
+						Tata AIA Life Insurance Company Limited (IRDAI Regn. No.110) CIN - U66010MH2000PLC128403<br> Registered & Corporate Office: 14th Floor, Tower A, Peninsula Business Park, Senapati Bapat Marg,<br> Lower Parel, Mumbai - 400013
+					</address>
+					<div align=center>
+						<div style="border: 1px solid black; font-size: 14px; padding: 10px">
+							<div align='left'>
+								Beware of Spurious Phone calls and Fictitious/Fraudulent offers: <br> IRDAI clarifies to public that:
+							</div>
+							<ul align='left' style="list-style-type: disc; padding-left: 20px">
+								<li>IRDAI or its officials do not involve in activities like sale of any kind of insurance or financial products nor invest premiums.</li>
+								<li>IRDAI does not announce any bonus. Public receiving such phone calls are requested to lodge a police complaint along with details of phone call, number.</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-12 col-sm-12 col-xs-12" ng-if="cdc.BUSINESS_TYPE == cdc.COVERFOX_BUSINESS_TYPE">
+					<p>Insurance cover is available under this product. This product is underwritten by Tata AIA Life Insurance Company Ltd. This plan is not a guaranteed issuance plan and it will be subject to Company's underwriting and acceptance. In case of Sub Standard lives, extra premiums will be charged as per our underwriting Guidelines. Income Tax benefits would be available as per the prevailing income tax laws, subject to fulfillment of conditions stipulated therein. Tata AIA Life Insurance Company Ltd. does not assume responsibility on tax implication mentioned anywhere in this document. Please consult your own tax consultant to know the tax benefits available to you. For more details on risk factors, terms and conditions please read sales brochure carefully before concluding a sale.</p>
+
+					<p>This Insurance product is sourced by you through Coverfox (IRDA Direct Broker Code : IRDA/DB 556/16, valid till 26/12/2019). its registered office at - Aastha, Plot no. 71, Sector 10A, Vashi, Navi Mumbai - 400703. Participation by the distributor's clients in the Insurance products is purely on a voluntary basis. Prospective client(s) are advised to go through all comparable products in offer, before taking an investment decision. Participation by the client in the insurance products is purely on a voluntary basis.</p>
+
+					<p align='justify'>For any information including cancellation, claims and complaints, please contact our Insurance advisor or visit Tata AIA Life's nearest branch office or call 1-860-266-9966 (local charges apply) or write to us at customercare@tataaia.com. Visit us at: www.tataaia.com or SMS 'LIFE' to 58888. L&C/Advt/2018/Apr/242</p>
+					<address align='center' style="font-size: 14px">Tata AIA Life Insurance Company Limited (IRDAI Regn. No.110) CIN - U66010MH2000PLC128403 Registered & Corporate Office: 14th Floor, Tower A, Peninsula Business Park, Senapati Bapat Marg, Lower Parel, Mumbai - 400013 Trade logo displayed above belongs to Tata Sons Ltd and AIA Group Ltd. and is used by Tata AIA Life Insurance Ltd under a license.</address>
+					<div align=center>
+						<div style="border: 1px solid black; font-size: 14px; padding: 10px">
+							<div align='left'>
+								Beware of Spurious Phone calls and Fictitious/Fraudulent offers: <br> IRDAI clarifies to public that:
+							</div>
+							<ul align='left' style="list-style-type: disc; padding-left: 20px">
+								<li>IRDAI or its officials do not involve in activities like sale of any kind of insurance or financial products nor invest premiums.</li>
+								<li>IRDAI does not announce any bonus. Public receiving such phone calls are requested to lodge a police complaint along with details of phone call, number.</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="disclaimerSRP" ng-if="cdc.showDisclaimer233">
+	<div class="popup_cont col-lg-12">
+		<div class="popup_form_cont disclaimer mr">
+			<h2>Disclaimer</h2>
+			<div class="disclaimerForm form-wrap" align='justify' style='padding-right: 50px'>
+				<div class="col-lg-12 col-sm-12 col-xs-12">
+					<ul class="starbull" style="list-style-type: disc;">
+						<li>Insurance cover is available under this product</li>
+						<li>Riders are not mandatory and is available for a nominal extra cost. For more details on benefits, premiums and exclusions under the Riders, please refer to the product brochure or contact Tata AIA Life's Insurance Advisor/ branch</li>
+						<li>This product is underwritten by Tata AIA Life Insurance Company Ltd. This plan is not a guaranteed issuance plan and it will be subject to Company's underwriting and acceptance</li>
+						<li>Buying a Life Insurance policy is a long-term commitment. An early termination of the policy usually involves high costs and the Surrender Value payable may be less than all the Premiums Paid.</li>
+						<li>In case of non-standard lives and on submission of non-standard age proof, extra premiums will be charged as per our underwriting guidelines. Insurance cover is available under this product.</li>
+						<li>^Income Tax benefits would be available as per the prevailing income tax laws, subject to fulfilment of conditions stipulated therein. Tata AIA Life Insurance Company Ltd. does not assume responsibility on tax implication mentioned anywhere in this document. Please consult your own tax consultant to know the tax benefits available to you.</li>
+						<li>*where the life assured is a female, the premium would be set back by 3 years of male premium rate ; i.e. premiums for female lives would be calculated using an age three years younger than male lives.</li>
+						<li><sup>1</sup>All Premiums Paid (excluding applicable taxes, cesses & Levies, underwriting extra premiums and modal loading, if any) will be returned on maturity.</li>
+						<li>For more details on risk factors, terms and conditions please read sales brochure carefully before concluding a sale.</li>
+					</ul>
+					<p>HDFC Securities Limited (IRDAI Registration No: CA 0062) is the Corporate Agent of Tata AIA Life Insurance Company Limited and does not underwrite the risk or act as an insurer. HDFC Securities Limited, has its registered office at Office Floor 8, "I THINK" Building, Jolly Board Campus, Kanjurmarg (East), Mumbai - 400042. Participation by the distributor's clients in the Insurance products is purely on a voluntary basis. Trade logo displayed above belongs to Tata Sons Ltd and AIA Group Ltd. and is used by Tata AIA Life Insurance Company Ltd under a license. Participation by the Bank's clients in the insurance products is purely on a voluntary basis. The contract of insurance is between Tata AIA Life and the insured and not between HDFC Bank and the insured.</p>
+					<p align='justify'>
+						For any information including cancellation, claims and complaints, please contact our Insurance advisor or visit Tata AIA Life's nearest branch office or call 1-860-266-9966 (local charges apply) or write to us at customercare@tataaia.com. Visit us at: www.tataaia.com or SMS 'LIFE' to 58888. <b>L&C/Advt/2018/Mar/156</b>
+					</p>
+					<address align='center' style="font-size: 14px">
+						Tata AIA Life Insurance Company Limited (IRDAI Regn. No.110) CIN - U66010MH2000PLC128403<br> Registered & Corporate Office: 14th Floor, Tower A, Peninsula Business Park, Senapati Bapat Marg,<br> Lower Parel, Mumbai - 400013
+					</address>
+					<div align=center>
+						<div style="border: 1px solid black; font-size: 14px; padding: 10px">
+
+							<div align='left'>
+								Beware of Spurious Phone calls and Fictitious/Fraudulent offers: <br> IRDAI clarifies to public that:
+							</div>
+							<ul align='left' style="list-style-type: disc; padding-left: 20px">
+								<li>IRDAI or its officials do not involve in activities like sale of any kind of insurance or financial products nor invest premiums.</li>
+								<li>IRDAI does not announce any bonus. Public receiving such phone calls are requested to lodge a police complaint along with details of phone call, number.</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="disclaimerSIP" ng-if="cdc.showDisclaimer240">
+	<div class="popup_cont col-lg-12">
+		<div class="popup_form_cont disclaimer mr">
+			<h2>Disclaimer</h2>
+			<div class="disclaimerForm form-wrap" align='justify' style='padding-right: 50px'>
+				<div class="col-lg-12 col-sm-12 col-xs-12">
+					<p>This product is underwritten by Tata AIA Life Insurance Company Limited. For more details on risk factors, terms and conditions please read sales brochure carefully before concluding a sale. Income Tax benefits would be available as per the prevailing income tax laws, subject to fulfillment of conditions stipulated therein. Tata AIA Life Insurance Company Ltd. does not assume responsibility on tax implication mentioned anywhere in this document. Please consult your own tax consultant to know the tax benefits available to you.</p>
+					<p>1Guaranteed Returns are defined as Guaranteed Payout (GP)/ Guaranteed Maturity Payout (GMP) under both Plan Options. For Regular Income option, GP is 120% to 160% of the Annualised Premium (AP) and GMP is 46% to 405% of AP for male lives and 74% to 408% of AP for female lives. Please refer survival benefit factor under regular income option. For Endowment option, GP is 5.26 to 15.03 times of AP for Male lives and 5.36 to 15.04 times of AP for female lives and GMP is equal to GP, provided the policy is in-force and all due premiums have been paid. The GP/GMP factors under both the plan options will depend on premium payment term, age and gender of the Life Insured.</p>
+					<p>Buying a Life Insurance policy is a long-term commitment. An early termination of the policy usually involves high costs and the Surrender Value payable may be less than the all the Premiums Paid. This plan is not a guaranteed issuance plan and it will be subject to Company's underwriting and acceptance. In case of non-standard lives and on submission of non-standard age proof, extra premiums will be charged as per our underwriting guidelines. Insurance cover is available under this product.</p>
+					<p>HDFC Securities Limited (IRDAI Registration No: CA 0062) is the Corporate Agent of Tata AIA Life Insurance Company Limited and does not underwrite the risk or act as an insurer. HDFC Securities Limited, has its registered office at Office Floor 8, "I THINK" Building, Jolly Board Campus, Kanjurmarg (East), Mumbai - 400042. Participation by the distributor's clients in the Insurance products is purely on a voluntary basis. The contract of Insurance is between Tata AIA Life and the Insured and not between HDFC Securities and the Insured. Trade logo displayed above belongs to Tata Sons Ltd and AIA Group Ltd. and is used by Tata AIA Life Insurance Ltd under a license. Participation by the Bank's clients in the insurance products is purely on a voluntary basis. The contract of insurance is between Tata AIA Life and the insured and not between HDFC Bank and the insured.</p>
+					<p align='justify'>
+						For any information including cancellation, claims and complaints, please contact our Insurance advisor or visit Tata AIA Life's nearest branch office or call 1-860-266-9966 (local charges apply) or write to us at customercare@tataaia.com. Visit us at: www.tataaia.com or SMS 'LIFE' to 58888.<b> L&C/Advt/2017/Dec/480</b>
+					</p>
+					<address align='center' style="font-size: 14px">
+						Tata AIA Life Insurance Company Limited (IRDAI Regn. No.110) CIN - U66010MH2000PLC128403<br> Registered & Corporate Office: 14th Floor, Tower A, Peninsula Business Park, Senapati Bapat Marg,<br> Lower Parel, Mumbai - 400013
+					</address>
+					<div align=center>
+						<div style="border: 1px solid black; font-size: 14px; padding: 10px">
+
+							<div align='left'>
+								Beware of Spurious Phone calls and Fictitious/Fraudulent offers: <br> IRDAI clarifies to public that:
+							</div>
+							<ul align='left' style="list-style-type: disc; padding-left: 20px">
+								<li>IRDAI or its officials do not involve in activities like sale of any kind of insurance or financial products nor invest premiums.</li>
+								<li>IRDAI does not announce any bonus. Public receiving such phone calls are requested to lodge a police complaint along with details of phone call, number.</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="disclaimerGIP" ng-if="cdc.showDisclaimer226">
+	<div class="popup_cont col-lg-12">
+		<div class="popup_form_cont disclaimer mr">
+			<h2>Disclaimer</h2>
+			<div class="disclaimerForm form-wrap" align='justify' style='padding-right: 50px'>
+				<div class="col-lg-12 col-sm-12 col-xs-12">
+					<p>
+						<sup>1</sup>Guaranteed Returns are defined as Guaranteed Maturity Benefit equal to 100% of the Basic Sum Assured and Guaranteed Income is equal to 12% of Basic Sum Assured, shall commence from the end of year following Maturity which increases annually (compounding increase) by an Income Booster. Income Booster percentage will depend on premium amount, premium paying term and income term chosen by the Policyholder at inception of the policy. **Tata AIA Life Insurance Accidental Death and Dismemberment (Long Scale) (ADDL) Rider and (UIN:110B028V01), Tata AIA Life Insurance Waiver of Premium Plus (WOPP) Rider (UIN:110B029V01) and Tata AIA Life Insurance Term Rider (110B030V01) are not mandatory and are available for a nominal extra cost. For more details on benefits, premiums and exclusions under the Riders, please contact your nearest HDFC Bank branch. Buying a Life Insurance policy is a long-term commitment. An early termination of the policy usually involves high costs and the
+						Surrender Value payable may be less than the all the Premiums Paid. This plan is not a guaranteed issuance plan and it will be subject to Company's underwriting and acceptance. In case of non-standard lives and on submission of non-standard age proof, extra premiums will be charged as per our underwriting guidelines. Insurance cover is available under this product.
+					</p>
+					<p>This product is underwritten by Tata AIA Life Insurance Company Limited. For more details on risk factors, terms and conditions please read sales brochure carefully before concluding a sale. All applicable taxes, duties, surcharge, cesses or levies, as may be imposed by Government, any statutory or administrative authority from time to time, on the premiums payable and benefits secured under Policy, shall be borne and paid by the Policyholder. Income Tax benefits would be available as per the prevailing income tax laws, subject to fulfillment of conditions stipulated therein. Tata AIA Life Insurance Company Ltd. does not assume responsibility on tax implication mentioned anywhere in this document. Please consult your own tax consultant to know the tax benefits available to you.</p>
+					<p>UIN: 110N131V01 |</p>
+					<p>HDFC Securities Limited (IRDAI Registration No:Â  CA 0062) is the Corporate Agent of Tata AIA Life Insurance Company Limited and does not underwrite the risk or act as an insurer. HDFC Securities Limited, has itsÂ  registered office at Office Floor 8, "I THINK" Building, Jolly Board Campus, Kanjurmarg (East), Mumbai - 400042. Participation by the distributor's clients in the Insurance products is purely on a voluntary basis. The contract of Insurance is between Tata AIA Life and the Insured and not between HDFC Securities andÂ the Insured.</p>
+					<p align='justify'>
+						For any information including cancellation, claims and complaints, please contact our Insurance Advisor/ Intermediary or visit Tata AIA Life's nearest branch office or call 1-860-266-9966 (local charges apply) or write to us at customercare@tataaia.com. Visit us at: www.tataaia.com or SMS 'LIFE' to 58888.Trade logo displayed above belongs to Tata Sons Ltd and AIA Group Ltd. and is used by Tata AIA Life Insurance Ltd under a license. Participation by the Bank's clients in the insurance products is purely on a voluntary basis. The contract of insurance is between Tata AIA Life and the insured and not between HDFC Bank and the insured.<br /> <b>L&C/Advt/2018/Mar/207</b>
+					</p>
+					<address align='center' style="font-size: 14px">
+						Tata AIA Life Insurance Company Limited (IRDAI Regn. No.110).<br> Registered & Corporate Office: 14th Floor, Tower A, Peninsula Business Park, Senapati Bapat Marg,<br> Lower Parel, Mumbai - 400013
+					</address>
+					<div align=center>
+						<div style="border: 1px solid black; font-size: 14px; padding: 10px">
+
+							<div align='left'>
+								Beware of Spurious Phone calls and Fictitious/Fraudulent offers: <br> IRDAI clarifies to public that:
+							</div>
+							<ul align='left' style="list-style-type: disc; padding-left: 20px">
+								<li>IRDAI or its officials do not involve in activities like sale of any kind of insurance or financial products nor invest premiums.</li>
+								<li>IRDAI does not announce any bonus. Public receiving such phone calls are requested to lodge a police complaint along with details of phone call, number.</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="disclaimerDSP" ng-if="cdc.showDisclaimer238">
+	<div class="popup_cont col-lg-12">
+		<div class="popup_form_cont disclaimer mr">
+			<h2>Disclaimer</h2>
+			<div class="disclaimerForm form-wrap" align='justify' style='padding-right: 50px'>
+				<div class="col-lg-12 col-sm-12 col-xs-12">
+					<ul class="starbull" align='left' style="list-style-type: disc;">
+						<li>*Guaranteed Income of 20% or 25% of Assured Benefit shall be paid annually commencing from the end of policy year 9 or 13, for premium payment term 8 or 12 respectively and shall be payable till maturity of the Policy or till death, whichever is earlier.</li>
+						<li>Insurance cover is available under this product</li>
+						<li>**Tata AIA Life Insurance Accidental Death and Dismemberment (Long Scale) (ADDL) Rider (UIN: 110B028V01), Tata AIA Life Insurance Waiver of Premium Plus (WOPP) Rider (UIN: 110B029V01) and Tata AIA Life Insurance Term Rider (110B030V01) are available under this plan. Riders are not mandatory and is available for a nominal extra cost. For more details on benefits, premiums and exclusions under the Riders, please refer to the product brochure or contact Tata AIA Life's Insurance Advisor/ Intermediary/ Branch</li>
+						<li>This product is underwritten by Tata AIA Life Insurance Company Ltd. This plan is not a guaranteed issuance plan and it will be subject to Company's underwriting and acceptance.</li>
+						<li>Buying a Life Insurance policy is a long-term commitment. An early termination of the policy usually involves high costs and the Surrender Value payable may be less than all the Premiums Paid.</li>
+						<li>This product will be offered only to Standard lives.</li>
+						<li>^Income Tax benefits would be available as per the prevailing income tax laws, subject to fulfilment of conditions stipulated therein. Tata AIA Life Insurance Company Ltd. does not assume responsibility on tax implication mentioned anywhere in this document. Please consult your own tax consultant to know the tax benefits available to you</li>
+						<li>For more details on risk factors, terms and conditions please read sales brochure carefully before concluding a sale.</li>
+						<li>#Bonuses comprises of Compound Reversionary Bonus and Terminal Bonus, if any and are non-guaranteed benefits.</li>
+					</ul>
+					<p>HDFC Securities Limited (IRDAI Registration No: CA 0062) is the Corporate Agent of Tata AIA Life Insurance Company Limited and does not underwrite the risk or act as an insurer. HDFC Securities Limited, has its registered office at Office Floor 8, "I THINK" Building, Jolly Board Campus, Kanjurmarg (East), Mumbai - 400042. Participation by the distributor's clients in the Insurance products is purely on a voluntary basis. The contract of Insurance is between Tata AIA Life and the Insured and not between HDFC Securities and the Insured. Trade logo displayed above belongs to Tata Sons Ltd and AIA Group Ltd. and is used by Tata AIA Life Insurance Ltd under a license. Participation by the Bank's clients in the insurance products is purely on a voluntary basis. The contract of insurance is between Tata AIA Life and the insured and not between HDFC Bank and the insured.</p>
+					<p align='justify'>
+						For any information including cancellation, claims and complaints, please contact our Insurance advisor or visit Tata AIA Life's nearest branch office or call 1-860-266-9966 (local charges apply) or write to us at customercare@tataaia.com. Visit us at: www.tataaia.com or SMS 'LIFE' to 58888.<b> L&C/Advt/2018/Mar/152</b>
+					</p>
+					<address align='center' style="font-size: 14px">
+						Tata AIA Life Insurance Company Limited (IRDAI Regn. No.110) CIN - U66010MH2000PLC128403<br> Registered & Corporate Office: 14th Floor, Tower A, Peninsula Business Park, Senapati Bapat Marg,<br> Lower Parel, Mumbai - 400013
+					</address>
+					<div align=center>
+						<div style="border: 1px solid black; font-size: 14px; padding: 10px">
+
+							<div align='left'>
+								Beware of Spurious Phone calls and Fictitious/Fraudulent offers: <br> IRDAI clarifies to public that:
+							</div>
+							<ul align='left' style="list-style-type: disc; padding-left: 20px">
+								<li>IRDAI or its officials do not involve in activities like sale of any kind of insurance or financial products nor invest premiums.</li>
+								<li>IRDAI does not announce any bonus. Public receiving such phone calls are requested to lodge a police complaint along with details of phone call, number.</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="disclaimerFP" ng-if="cdc.showDisclaimer228">
+	<div class="popup_cont col-lg-12">
+		<div class="popup_form_cont disclaimer mr">
+			<h2>Disclaimer</h2>
+			<div class="disclaimerForm form-wrap" align='justify' style='padding-right: 50px'>
+				<div class="col-lg-12 col-sm-12 col-xs-12">
+					<p>This product is underwritten by Tata AIA Life Insurance Company Limited. For more details on risk factors, terms and conditions please read sales brochure carefully before concluding a sale. All applicable taxes, duties, surcharge, cesses or levies, as may be imposed by Government, any statutory or administrative authority from time to time, on the premiums payable and benefits secured under Policy, shall be borne and paid by the Policyholder. ^Income Tax benefits would be available as per the prevailing income tax laws, subject to fulfillment of conditions stipulated therein. Tata AIA Life Insurance Company Ltd does not assume responsibility on tax implication mentioned anywhere in this document. Please consult your own tax consultant to know the tax benefit available to you.</p>
+					<p>*The Premium paid in the Unit Linked Life Insurance Policies are subject to investment risks associated with capital markets and the NAVs of the units may go up or down based on the performance of fund and factors influencing the capital market and the Insured is responsible for his/her decisions. Investments are subject to market risks. Unit Linked Life Insurance products are different from the traditional insurance products and are subject to the risk factors. Please know the associated risks and the applicable charges, from your Insurance agent or the Intermediary or policy document issued by the insurance company. The performance of the managed portfolios and funds is not guaranteed and the value may increase or decrease in accordance with the future experience of the managed portfolios and funds. Past performance is not indicative of future performance. Tata AIA Life Insurance Company Ltd. is only the name of the Insurance Company and Tata AIA Life Insurance Fortune
+						Pro is only the name of the Unit Linked Life Insurance Contract and does not in any way indicate the quality of the contract, its future prospects or returns. The various funds offered under this contract are the names of the funds and do not in any way indicate the quality of these plans, their future prospects and returns. The underlying Fund's NAV will be affected by interest rates and the performance of the underlying stocks. Insurance cover is available under this product.</p>
+					<p>Tata AIA Life Insurance Waiver of Premium (Linked) Rider (UIN: 110A026V01); Tata AIA Life Insurance Waiver of Premium Plus (Linked) Rider (UIN: 110A025V01); Tata AIA Life Insurance Accidental Death and Dismemberment (Long Scale) (ADDL) Linked Rider (UIN: 110A027V01) are not mandatory and are available for a nominal extra cost. For more details on benefits, premiums and exclusions under the Rider(s), please contact Tata AIA Life's Insurance Advisor/ Intermediary/ Branch.</p>
+					<p>UIN: 110L112V02 |</p>
+					<p>
+						HDFC Securities Limited (IRDAI Registration No: CA 0062) is the Corporate Agent of Tata AIA Life Insurance Company Limited and does not underwrite the risk or act as an insurer. HDFC Securities Limited, has its registered office at Office Floor 8, "I THINK" Building, Jolly Board Campus, Kanjurmarg (East), Mumbai - 400042. Participation by the distributor's clients in the Insurance products is purely on a voluntary basis. The contract of Insurance is between Tata AIA Life and the Insured and not between HDFC Securities and the Insured. Trade logo displayed above belongs to Tata Sons Ltd and AIA Group Ltd. and is used by Tata AIA Life Insurance Ltd under a license. Participation by the Bank's clients in the insurance products is purely on a voluntary basis. The contract of insurance is between Tata AIA Life and the insured and not between HDFC Bank and the Insured. For any information including cancellation, claims and complaints, please contact our Insurance Advisor/
+						Intermediary or visit Tata AIA Life's nearest branch office or call 1-860-266-9966 (local charges apply) or write to us at customercare@tataaia.com. Visit us at: www.tataaia.com or SMS 'LIFE' to 58888.<b>L&C/Advt/2018/Mar/174</b>
+					</p>
+					<address align='center' style="font-size: 14px">
+						Tata AIA Life Insurance Company Limited (IRDAI Regn. No.110) CIN - U66010MH2000PLC128403<br> Registered & Corporate Office: 14th Floor, Tower A, Peninsula Business Park, Senapati Bapat Marg,<br> Lower Parel, Mumbai - 400013
+					</address>
+					<div align=center>
+						<div style="border: 1px solid black; font-size: 14px; padding: 10px">
+
+							<div align='left'>
+								Beware of Spurious Phone calls and Fictitious/Fraudulent offers: <br> IRDAI clarifies to public that:
+							</div>
+							<ul align='left' style="list-style-type: disc; padding-left: 20px">
+								<li>IRDAI or its officials do not involve in activities like sale of any kind of insurance or financial products nor invest premiums.</li>
+								<li>IRDAI does not announce any bonus. Public receiving such phone calls are requested to lodge a police complaint along with details of phone call, number.</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="disclaimerTR" ng-if="cdc.showdisclaimerTR">
+	<div class="popup_cont col-lg-12">
+		<div class="popup_form_cont disclaimer mr">
+			<form name="cdc.disclaimerForm" novalidate>
+				<h2 class="text-center">CONSENT</h2>
+				<div class="disclaimerForm form-wrap">
+					<div class="col-lg-12 col-sm-12 col-xs-12">
+						<h5 class="bold">I hereby declare that:</h5>
+						<p class="margin-bottom-5 margin-top-20">
+							<input type="checkbox" name="agree2" id="agree2" value="Y" required ng-model="cdc.disclaimerData.agree2"><label for="agree2"><span class="check sprite"></span></label> I am purchasing the TATA AIA product on my own.
+						</p>
+						<div class="clear"></div>
+						<div ng-messages="cdc.disclaimerForm.agree2.$error" class="error-messages" ng-show="invaliddisclaimer || (cdc.disclaimerForm.agree2.$invalid && !cdc.disclaimerForm.agree2.$pristine)">
+							<div ng-message="required">Please select disclaimer</div>
+						</div>
+						<div class="clear"></div>
+						<p class="margin-bottom-5 margin-top-20">
+							<input type="checkbox" name="agree3" id="agree3" value="Y" required ng-model="cdc.disclaimerData.agree3"><label for="agree3"><span class="check sprite"></span></label> I hereby authorize DBS Bank Ltd. to share my KYC details with Tata AIA Life Insurance Company Ltd. for the purposes of completing this insurance application.
+						</p>
+						<div ng-messages="cdc.disclaimerForm.agree3.$error" class="error-messages" ng-show="invaliddisclaimer || (cdc.disclaimerForm.agree3.$invalid && !cdc.disclaimerForm.agree3.$pristine)">
+							<div ng-message="required">Please select disclaimer</div>
+						</div>
+						<div class="clear"></div>
+					</div>
+					<div class="col-lg-12 col-sm-12 col-xs-12 top-15">
+						<input class=" blkbtn" name="disclaimerSubmits" id="disclaimerSubmits" type="button" value="Agree & Proceed" ng-click="cdc.disclaimerSubmit(cdc.disclaimerForm)" />
+					</div>
+				</div>
+				<p>&nbsp;</p>
+				<p align="justify">I agree that I am being redirected to Tata AIA Life Insurance portal which is not owned or controlled by DBS Bank Ltd. and by clicking on â€˜Agree & Proceedâ€™ button. I understand that the information/content on this portal is owned and managed by Tata AIA Life Insurance Company Limited. I understand and accept that DBS Bank Ltd. does not control the portal and bears no responsibility for it.</p>
+				<!-- <p>
+						<b>RM assist- (Toggle on & off) I hereby request for RM assistance to help me fill the application form.</b>
+					</p> -->
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- OKYC : this pop-up will display when okyc radio btn value is yes -->
+<div id="OKYC" class="dn">
+	<div class="popup_cont col-lg-12">
+		<div class="popup_form_cont okyc mr">
+			<form name="cdc.okycForm" novalidate>
+				<h2>Consent for Authentication</h2>
+				<div class="mr">
+					<div class="center-texted col-lg-12">
+						<div class="row center-texted">
+                        	<br>
+                        	<div class="col-lg-0">
+	                        	<input type="checkbox" name="agreeokyc" id="agreeokyc" value="Y" required ng-model="cdc.okyc.agreeokyc">
+	                        	<label for="agreeokyc"><span class="check sprite"></span></label>
+                        	</div>
+                        	<div class="col-lg-11">
+								<h4 class="okycPopUpText">I hereby voluntarily give my consent to TATA AIA Life insurance Co. Ltd to obtain and use my Aadhaar details (including demographic information or any other information) to conduct offline verification for KYC purpose only in relation to this Policy. I further declare that TATA AIA Life insurance Co. Ltd has informed me on alternatives for submission of information requested and i have understood the same.</h4>
+                        	</div>
+						</div>
+						<div ng-messages="cdc.okycForm.agreeokyc.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.okycForm.agreeokyc.$invalid && !cdc.okycForm.agreeokyc.$pristine)">
+							<div ng-message="required">Please tick the check box.</div>
+						</div>
+						<h3>Steps to use Aadhaar based KYC</h3>
+						<h5>Note: Keep your Aadhaar number/ Virtual ID ready</h5>
+						<h5>Step 1: Click here to visit UIDAI site : <a class="offlinkAadhar" href="{{cdc.aadharOKYC}}" target="_blank"><u>Link to download Offline Aadhaar</u></a></h5>
+						<h5>Step 2: Enter the below details:</h5>
+						<ul class="aadharlistStyle">
+							<li><h5>Aadhaar number / Virtual ID</h5></li>
+						 	<li><h5>Captcha</h5></li>
+							<li><h5>Share code (any 4 digit code)</h5></li>
+							<li><h5>OTP received on your mobile number registered with Aadhaar</h5></li>
+						</ul>
+						<h5>Step 3: Click on Download button. Zip file will be saved in downloads section of your device</h5>
+						<h5>Step 4: Come back to your application journey</h5>
+						<h5>Step 5: Upload zip file from your download section (do not change the name of the file while uploading) + enter the share code from step 2</h5>
+						<h5>Step 6: Click on 'Next' button Offline Aadhaar KYC data will be displayed . Click on 'Ok' will land you back to customer details/proposer details page.</h5>
+						<h5>All your details (Name, Date of birth, Address, Gender, Contact details) will be pre-filled in the journey.</h5>
+					</div>
+					<div class="center-texted col-lg-12">
+						<input class="blkbtn next-slide fl" type="button" value="Submit" ng-click="cdc.onOkycSubmit()" />
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<section class="content-bg">
+	<div class="container inner_wrap2 leadpage">
+		<div class="row">
+			<div class="col-md-12">
+				<h2 ng-if="cdc.isPASA">Thank you for your interest! To know more about Tata AIA Lifeâ€™s exclusive offer for TCS employees, kindly share your details below:</h1>
+				<h1>{{cdc.isPASA ? 'Customer Details' : 'Customer Details / Proposer Details'}}</h1>
+				<div class="form-wrap">
+					<!-- Accordion -->
+					<div id="st_accordion" class="acc pinkAcco" ng-show="!cdc.isIBLCIFCampaign">
+						<div class="investment active" style="display: block">
+							<form name="cdc.custDetailForm" id="cdc.custDetailForm" novalidate>
+								<div class=" {{cdc.isPASA ? 'col-lg-12 col-sm-12 col-xs-12 makeInputCenter' : 'col-lg-6 col-sm-6 col-xs-12'}}">
+									<!-- OKYC : OKYC Radio Button start -->
+									<div class="wrap" ng-if="cdc.isKYCEnabled">
+										<p ng-if="!cdc.isBankKYC">Auto-fill your form using Aadhaar based KYC<em>*  </em></p>
+										<p ng-if="cdc.isBankKYC">Auto-fill your form using Aadhaar based KYC or Bank KYC<em>*  </em></p>
+										<div class="okycRadio" ng-if="cdc.isAadhaarOKYC">
+										<input type="radio" id="okycA" name="okyc" value="A" ng-model="cdc.okyc.isKYC" ng-change="cdc.onOkycChange()" ng-required="true">
+											<label for="okycA" ng-if="cdc.isBankKYC"><span class="radio sprite"></span> Aadhaar Based KYC</label>
+											<label for="okycA" ng-if="!cdc.isBankKYC"><span class="radio sprite"></span> Yes</label>
+											<input href="#OKYC" class="blkbtn OKYC fl" type="button" ng-hide="true" />
+											<a class="fa fa-exclamation-circle hoverclass">
+												<div id="BoxTooltip">
+													<p>Important Note:</p>
+													<ul>
+													  <li>Mobile number must be registered with UIDAI.</li>
+													  <li>OTP received from UIDAI on registered mobile number is required for 'Aadhaar based KYC'.</li>
+													</ul>
+												</div>
+											</a>
+										</div>
+										<div class="radio_wrap3" ng-if="cdc.isBankKYC">
+											<input type="radio" id="okycB" name="okyc" value="B" ng-model="cdc.okyc.isKYC" ng-change="cdc.onOkycChange()" ng-required="true"> <label for="okycB"><span class="radio sprite"></span> Bank KYC <a class="fa fa-exclamation-circle" data-toggle="tooltip" title="KYC and personal information as per Bank records to be used for quick completion of your online insurance application."></a></label>
+										</div>
+										<div class="radio_wrap3">
+											<input type="radio" id="okycN" name="okyc" value="N" ng-model="cdc.okyc.isKYC" ng-change="cdc.onOkycChange()" ng-required="true"> <label for="okycN"><span class="radio sprite"></span> No</label>
+										</div>
+										<div ng-messages="cdc.custDetailForm.okyc.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.okyc.$invalid && !cdc.custDetailForm.okyc.$pristine)">
+											<div ng-message="required">Please select any value.</div>
+										</div>
+									</div>
+									<div class="wrap" ng-if="cdc.okyc.isKYC == 'N'">
+										<p ng-if="!cdc.isBankKYC"><em>Re-think !! We recommend you to select 'Yes' for Aadhar based KYC to auto fill your form and avoid KYC document upload</em></p>
+										<p ng-if="cdc.isBankKYC"><em>Re-think !! We recommend you to choose either Aadhar based KYC or Bank KYC to auto fill your form and avoid KYC document upload</em></p>
+									</div>
+									<br>
+									<div class="wrap" ng-if="cdc.isBankKYC && cdc.okyc.isKYC == 'B'">
+										<input type="text" class="inputText full-width" placeholder="Account Number" name="accountNumber" ng-model="cdc.customerData.Account_Number" ng-maxlength="10" ng-pattern="cdc.numberRegex" required /> <span class="floating-label">CBI Account Number<em>*</em></span>
+										</span>
+										<div ng-messages="cdc.custDetailForm.accountNumber.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.accountNumber.$invalid && !cdc.custDetailForm.accountNumber.$pristine)">
+											<div ng-message="required">CBI Account Number cannot be empty.</div>
+											<div ng-message="maxlength">CIF cannot exceed 10 digits.</div>
+											<div ng-message="pattern">Please enter digits only.</div>
+											<!--<div ng-message="pattern">{{cdc.ACCOUNT_NO_PATTERN}}</div>-->
+										</div>
+									</div>
+									
+									<div class="wrap" ng-if="cdc.isBankKYC && cdc.okyc.isKYC == 'B'">
+									<!-- Author by: Sumit Desai, Updated on: 23092020, CBI issue for 714 -->
+										<input type="number" class="inputText full-width" placeholder="Mobile Number" name="mobileNumber" ng-model="cdc.customerData.M_Number" ng-maxlength="20" required /> <span class="floating-label">Mobile Number<em>*</em></span>
+										</span>
+										<div style="margin: 5px;">
+											<b>Please use prefix Mobile number with country code e.g. 91 for India</b>
+										</div>
+										<div ng-messages="cdc.custDetailForm.mobileNumber.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.mobileNumber.$invalid && !cdc.custDetailForm.mobileNumber.$pristine)">
+											<div ng-message="required">Mobile Number cannot be empty.</div>
+											<!-- Author by: Sumit Desai, Updated on: 23092020, CBI issue for 714 -->
+											<div ng-message="maxlength">Please enter maximum 20 digit only.</div>
+											<!--<div ng-message="pattern">{{cdc.MOBILE_PATTERN_MSG}}</div>-->
+										</div>
+									</div>
+									
+									<div ng-if="cdc.isBankKYC && cdc.okyc.isKYC == 'B'">
+										<p class="margin-bottom-5 margin-top-20">
+											<input type="checkbox" name="agre1" id="agre1" ng-model="cdc.custDetailForm.agre1" required><label for="agre1"><span class="check sprite"></span></label> I hereby consent to using my KYC information available with Central Bank of India for completion of insurance application with Tata AIA Life Insurance
+											<div ng-messages="cdc.custDetailForm.agre1.$error" class="error-messages" ng-show="invalid || (cdc.custDetailForm.agre1.$invalid && !cdc.custDetailForm.agre1.$pristine)">
+												<div ng-message="required">Please share your consent as its mandatory.</div>
+											</div>
+										</p>
+									</div>
+									
+									<div class="wrap clearfix top-btn" ng-if="cdc.isBankKYC && cdc.okyc.isKYC == 'B'">
+										<!-- GC code starts  -->
+										<input class="blkbtn next-slide fl" type="button" value="Verify Account" ng-click="cdc.onBKYCSubmit()" />										
+										<!-- GC code ends -->
+									</div>
+									
+									<!-- OKYC : OKYC Radio Button end -->
+									<!-- First Name -->
+									<div class="wrap">
+										<!-- <span title="Please enter first name as per aadhaar card"> -->
+										<input type="text" class="inputText full-width" placeholder="{{cdc.placeholderText}}" id="firstName" name="firstName" ng-disabled="(cdc.isLeadCreated || cdc.bkycDisabled || (cdc.isAadhaarOKYC && cdc.okyc.isKYC == 'A') || (cdc.isBankKYC && cdc.okyc.isKYC == 'B')) || (cdc.isCitiAPI) " ng-model="cdc.customerData.FIRST_NAME" ng-maxlength="20" ng-pattern="cdc.nameRegex" ng-change="cdc.customerData.FIRST_NAME = cdc.customerData.FIRST_NAME.toUpperCase();firstmiddlenamecheck();firstlastnamecheck();" required /> <span class="floating-label forceLabelUp">First Name<em>*</em></span>
+										</span>
+										<div ng-messages="cdc.custDetailForm.firstName.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.firstName.$invalid && !cdc.custDetailForm.firstName.$pristine)">
+											<div ng-message="required">First name cannot be empty.</div>
+											<div ng-message="pattern">Please use text and ' or - only.</div>
+											<div ng-message="maxlength">Maximum 20 char only.</div>
+										</div>
+										<span ng-show="cdc.firstmiddlenamesame" class=" ng-message">First name and Middle name can not be same.</span> <span ng-show="cdc.firstlastnamesame" class=" ng-message">As per Tata AIA underwriting guidelines, submission of policy having single name is not allowed. To continue with single name, please suffix S/O or D/O or W/O in last name.</span>
+									</div>
+
+									<!-- <div class="wrap" ng-if="cdc.isPASA">
+										<input name="addMName" id="addMName" type="checkbox" ng-model="cdc.showMNameInput"  ><label for="addMName" class="plus_minus_anchor margin-bottom-30 {{!cdc.showMNameInput ? 'btn-success' : 'btn-danger' }} "><span class="ico_plus_minus1 circle-grey"><b>{{!cdc.showMNameInput ? '+' : '-' }}</b></span></label>{{!cdc.showMNameInput ? 'Add Middle Name' : 'Remove Middle Name' }} 
+									</div> -->
+
+									<!-- Middle Name -->
+									<div class="wrap" ng-if="!cdc.isProceedBtnClicked">
+										<!-- <span title="Please enter middle name as per aadhaar card"> -->
+										<input type="text" class="inputText full-width" incomeband" name="middleName" ng-model="cdc.customerData.MIDDLE_NAME" placeholder="{{cdc.placeholderText}}" ng-maxlength="18" ng-pattern="cdc.middleNameRegex" ng-change="cdc.customerData.MIDDLE_NAME = cdc.customerData.MIDDLE_NAME.toUpperCase();firstmiddlenamecheck();lastmiddlenamecheck();" ng-disabled="(cdc.isAadhaarOKYC && cdc.okyc.isKYC == 'A') || (cdc.isCitiAPI) || (cdc.isBankKYC && cdc.okyc.isKYC == 'B') || cdc.bkycDisabled"/> <span class="floating-label forceLabelUp">Middle Name</span>
+										</span>
+										<div ng-messages="cdc.custDetailForm.middleName.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.middleName.$invalid && !cdc.custDetailForm.middleName.$pristine)">
+											<div ng-message="required">Middle name cannot be empty.</div>
+											<div ng-message="pattern">Please use text and ', space or - only.</div>
+											<div ng-message="maxlength">Maximum 18 char only.</div>
+											<div ng-message="firstmidsame">First name and Middle name can not be same.</div>
+											<div ng-message="lastmidsame">Last name and Middle name can not be same.</div>
+										</div>
+										<span ng-show="cdc.firstmiddlenamesame" class="ng-message">First name and Middle name can not be same.</span> <span ng-show="cdc.lastmiddlenamesame" class="ng-message">Last name and Middle name can not be same.</span>
+									</div>
+
+
+									<!-- Last Name -->
+									<div class="wrap {{cdc.isPASA ? 'margin-top-20' : ''}}" ng-if="!cdc.isProceedBtnClicked">
+										<!-- <span title="Please enter last name as per aadhaar card"> -->
+										<input type="text" class="inputText full-width" id="lastName" name="lastName" ng-model="cdc.customerData.LAST_NAME" placeholder="{{cdc.placeholderText}}" ng-maxlength="20" ng-pattern="cdc.nameRegex" ng-change="lastmiddlenamecheck();firstlastnamecheck();cdc.customerData.LAST_NAME = cdc.customerData.LAST_NAME.toUpperCase()" ng-disabled="(cdc.isAadhaarOKYC && cdc.okyc.isKYC == 'A') || (cdc.isCitiAPI) || (cdc.isBankKYC && cdc.okyc.isKYC == 'B') || cdc.bkycDisabled" required /> <span class="floating-label forceLabelUp">Last Name<em>*</em></span>
+										</span>
+										<div ng-messages="cdc.custDetailForm.lastName.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.lastName.$invalid && !cdc.custDetailForm.lastName.$pristine)">
+											<!-- <div ng-message="required">Last name cannot be empty.</div> -->
+											<div ng-message="pattern">Please use text and ' or - only.</div>
+											<div ng-message="maxlength">Maximum 20 char only.</div>
+										</div>
+										<span ng-show="cdc.lastmiddlenamesame" class="ng-message">Last name and Middle name can not be same.</span> <span ng-show="cdc.firstlastnamesame" class=" ng-message">As per Tata AIA underwriting guidelines, submission of policy having single name is not allowed. To continue with single name, please suffix S/O or D/O or W/O in last name.</span>
+									</div>
+
+
+									<!-- Gender -->
+									<!-- 27/10/2020 :: Rajan Kakaniya ::  Transgender_CR : Transgender option add in drop down -->
+									<div class="wrap" ng-if="!cdc.isPASA && !cdc.isProceedBtnClicked">
+										<div class="selectwrap">
+											<!-- <span title="Please enter gender as per aadhaar card"> -->
+												<select name="gender" id="gender" class="sel-opt" ng-model="cdc.customerData.GENDER_CD" required ng-disabled="cdc.isCitiAPI || (cdc.isBankKYC && cdc.okyc.isKYC == 'B') || cdc.bkycDisabled || (cdc.isAadhaarOKYC && cdc.okyc.isKYC == 'A')">
+												<option name="rdGender" value="1">Male</option>
+												<option name="rdGender" value="2">Female</option>
+												<option name="rdGender" value="3">Transgender</option>
+											</select> <span class="floating-label">Gender<em>*</em></span>
+											</span>
+											<div ng-messages="cdc.custDetailForm.gender.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.gender.$invalid && !cdc.custDetailForm.gender.$pristine)">
+												<div ng-message="required">Please select a gender.</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="wrap" ng-if="cdc.isPASA">
+										<p>Gender<em>*</em></p>
+										<div class="radio_wrap">
+											<input type="radio" id="gndF" name="gender" value="1" ng-model="cdc.customerData.GENDER_CD" ng-required="true"> <label for="gndF"><span class="radio sprite"></span> Male</label>
+										</div>
+										<div class="radio_wrap">
+											<input type="radio" id="gndM" name="gender" value="2" ng-model="cdc.customerData.GENDER_CD" ng-required="true"> <label for="gndM"><span class="radio sprite"></span> Female</label>
+										</div>
+
+										<div ng-messages="cdc.custDetailForm.gender.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.gender.$invalid && !cdc.custDetailForm.gender.$pristine)">
+											<div ng-message="required">Please select a gender.</div>
+										</div>
+									</div>
+
+									<!-- DOB -->
+									<div class="wrap col-lg-12 col-md-12 col-sm-12 col-xs-12 nopadding {{cdc.isPASA ? 'margin-top-10' : ''}}" ng-if="!cdc.isProceedBtnClicked">
+										<!-- <input type="date" ng-paste="$event.preventDefault();" datediff="1" class="dob inputText datepick full-width" id="dob" name="dob" ng-model="cdc.dob" ng-change="cdc.onDOBChange()" validate-dob required/>  
+										<span class="floating-label">Date of Birth (dd/mm/yyyy)<em>*</em></span>
+										<div ng-if="cdc.custDetailForm.dob.$error.date" class="ng-message-date">Please enter valid Date.</div>
+										<div ng-show="invalidleadForm || (cdc.custDetailForm.dob.$invalid && !cdc.custDetailForm.dob.$pristine)" ng-messages="cdc.custDetailForm.dob.$error" class="error-messages invalid">
+											<div ng-message="minAge">Minimum Age should be 18 years.</div>
+											<div ng-message="required">Date of Birth cannot be empty.</div>
+                                        </div> -->
+
+										<p class="input-group so-dt-pckr-wrapper">
+											<input name="dob" id="dob" type="text" ng-paste="$event.preventDefault();" placeholder="Date of Birth (DD-MM-YYYY)" class="form-control so-date-picker" uib-datepicker-popup="{{cdc.format}}" is-open="cdc.dobDatePopup.opened" datepicker-options="cdc.dobDateOptions" close-text="Close" ng-model="cdc.dob" ng-change="cdc.onDOBChange()" age-less-than-18-check required  ng-disabled="(cdc.isAadhaarOKYC && cdc.okyc.isKYC == 'A') || (cdc.isCitiAPI) || cdc.bkycDisabled"/> <span class="input-group-btn">
+												<button type="button" id="isPASAbutton"  name="isPASAbutton" class="btn btn-default so-dt-pckr-btn" ng-click="cdc.openDatePicker('dobDatePopup')">
+													<i class="glyphicon glyphicon-calendar"></i>
+												</button>
+											</span>
+										</p>
+										<div style="margin: 5px;">
+											<b>Date format: DD-MM-YYYY</b>
+										</div>
+										<div ng-show="invalidleadForm || (cdc.custDetailForm.dob.$invalid && !cdc.custDetailForm.dob.$pristine)" ng-messages="cdc.custDetailForm.dob.$error" class="error-messages invalid">
+											<div ng-message="required">Please enter a date.</div>
+											<div ng-message="date">Please enter a valid date.</div>
+											<div ng-message="minAge">Age should be at least 18 years.</div>
+										</div>
+									</div>
+
+
+									<!-- Email Id -->
+									<div class="wrap">
+										<input type="email" class="inputText full-width" name="email" id="email" ng-disabled="(cdc.isLeadCreated) || (cdc.disableEmail) || cdc.bkycDisabled" ng-model="cdc.customerData.EMAIL_ID" placeholder="Email" ng-pattern="cdc.emailRegex" ng-maxlength="50" required block-hash /> <span class="floating-label">Email<em>*</em></span>
+										<div ng-messages="cdc.custDetailForm.email.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.email.$invalid && !cdc.custDetailForm.email.$pristine)">
+											<div ng-message="required">Email-id cannot be empty.</div>
+											<div ng-message="pattern">Please enter a valid email-id.</div>
+											<div ng-message="maxlength">Maximum 50 char only.</div>
+											<div ng-message="blockHash">Please do not use '#' or '|'.</div>
+										</div>
+									</div>
+
+
+									<!-- Mobile Number -->
+									<div class="wrap">
+										<input type="text" class="inputText full-width" name="mobile" id="mobile" ng-disabled="(cdc.isLeadCreated) || (cdc.isCitiAPI) || cdc.bkycDisabled" ng-model="cdc.customerData.MOBILE_NO" placeholder="Mobile Number" ng-pattern="cdc.mobileRegex" required /> <span class="floating-label">Mobile Number<em>*</em></span>
+										<div ng-messages="cdc.custDetailForm.mobile.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.mobile.$invalid && !cdc.custDetailForm.mobile.$pristine)">
+											<div ng-message="required">Mobile number cannot be empty.</div>
+											<!-- TAAI-814 code starts -->
+											<!-- NRI Cases CR Start -->
+											<div ng-message="pattern">{{cdc.MOBILE_PATTERN_MSG}}</div>
+											<!-- TAAI-814 code ends -->
+											<!-- NRI Cases CR End -->
+										</div>
+									</div>
+									<div class="wrap" ng-if="cdc.isCBI">
+										<input type="number" class="inputText full-width" name="CIF" id="CIF" ng-model="cdc.customerData.BANK_CUSTOMER_ID" ng-disabled="cdc.bkycDisabled" ng-maxlength="10" ng-minlength="10" placeholder="CIF" required /> <span class="floating-label">CIF<em>*</em></span>
+										<div ng-messages="cdc.custDetailForm.CIF.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.CIF.$invalid && !cdc.custDetailForm.CIF.$pristine)">
+											<div ng-message="required">CIF cannot be empty.</div>
+											<div ng-message="maxlength">CIF cannot exceed 10 digits.</div>
+											<div ng-message="minlength">CIF cannot less than 10 digits.</div>
+										</div>
+									</div>
+									<div class="wrap" ng-if="cdc.isCBI">
+										<input type="number" class="inputText full-width" id="premiumExpected" name="premiumExpected" ng-model="cdc.customerData.PREMIUM_EXPECTED" ng-disabled="cdc.bkycDisabled" ng-maxlength="9" placeholder="Premium Pitched" required /> <span class="floating-label">Premium Pitched<em>*</em></span>
+										<div ng-messages="cdc.custDetailForm.premiumExpected.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.premiumExpected.$invalid && !cdc.custDetailForm.premiumExpected.$pristine)">
+											<div ng-message="required">Premium Pitched cannot be empty.</div>
+											<div ng-message="maxlength">Premium Pitched cannot exceed 9 digits.</div>
+										</div>
+									</div>
+									<div class="wrap" ng-if="cdc.isPASA">
+										<p>Do you smoke?*</p>
+										<div class="wrap">
+											<div class="radio_wrap smoker">
+												<input type="radio" id="smoker" name="smoker" value="Y" ng-disabled="cdc.bkycDisabled" ng-model="cdc.GCPASA.INSURED_IS_SMOKER" ng-required="true"> <label for="smoker"><span class="smoker1 sprite"></span></label>
+											</div>
+
+											<div class="radio_wrap smoker">
+												<input type="radio" id="nonsmoker" name="smoker" value="N" ng-model="cdc.GCPASA.INSURED_IS_SMOKER" ng-required="true"> <label for="nonsmoker"><span class="nonsmoker1 sprite"></span></label>
+											</div>
+											<div ng-messages="cdc.custDetailForm.smoker.$error" class="error-messages" ng-show="invalidleadForm || (cdc.custDetailForm.smoker.$invalid && !cdc.custDetailForm.smoker.$pristine)">
+												<div ng-message="required">Select an option</div>
+											</div>
+											<div class="clear"></div>
+										</div>
+									</div>
+									
+									<div class="wrap" ng-if="cdc.isPASA">
+										<input class="full-width inputText" type="text" ng-model="cdc.GCPASA.EMPLOYEE_ID" ng-maxlength="15" ng-pattern="cdc.alphaNumRegex" name="employeeid" id="employeeid" required/><span class="floating-label">Employee ID<em>*</em></span>
+										<div class="clear"></div>
+										<div ng-messages="cdc.custDetailForm.employeeid.$error" class="error-messages" ng-show="invalidleadForm || (cdc.custDetailForm.employeeid.$invalid && !cdc.custDetailForm.employeeid.$pristine)">
+											<div ng-message="required">Please enter Employee ID.</div>
+											<div ng-message="pattern">Enter valid Employee ID.</div>
+											<div ng-message="maxlength">Maximum 15 chars only.</div>
+										</div>
+									</div>
+									
+									<div class="selectwrap" ng-if="cdc.isPASA">
+										<select class="sel-opt" ng-options="option.LOV_CD as option.LOV_VALUE for option in cdc.IncomeBandList" ng-model="cdc.GCPASA.INCOME_BAND" id="incomeband" name="incomeband" required select-required="true" > </select>
+										<span class="floating-label">Income Band<em>*</em></span>
+										<div class="clear"></div>
+										<div ng-messages="cdc.custDetailForm.incomeband.$error" class="error-messages" ng-show="invalidleadForm || (cdc.custDetailForm.incomeband.$invalid && !cdc.custDetailForm.incomeband.$pristine)">
+											<div ng-message="required">Please enter Income Band.</div>
+											<div ng-message="selectRequired">Please enter Income Band.</div>
+										</div>
+								  </div>
+								  <div class="wrap checkwrap" ng-if="cdc.agencyCampaign && cdc.isProceedBtnClicked && !cdc.isConsentSelected">
+								  		<p class="margin-bottom-5 margin-top-20">
+											<input type="checkbox" name="consent" id="consent" required ng-model="cdc.custDetailForm.consent"><label for="consent"><span class="check sprite"></span></label> Please note by submitting your details, you are authorizing Tata AIA Life Insurance Company Limited or its representative to contact you through SMS/ Call/ Email. This would mean we would contact you even if you are registered on any Do Not Disturb list.
+										</p>
+										<div ng-messages="cdc.custDetailForm.consent.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.consent.$invalid && !cdc.custDetailForm.consent.$pristine)">
+											<div ng-message="required">Please share your consent as its mandatory</div>
+										</div>
+										<div class="clear"></div>
+										<input class=" blkbtn" type="button" value="Submit" ng-click="cdc.onConsentSubmit()" />
+								  </div>
+								  <div class="wrap" ng-if="cdc.agencyCampaign && cdc.isProceedBtnClicked && cdc.isConsentSelected">
+										<p>How would you like to proceed<em>*</em></p>
+										<div class="radio_wrap" style="width:50%">
+											<input type="radio" id="agentAssistance" name="proceed" value="1" ng-disabled="cdc.isLeadCreated" ng-model="cdc.customerData.PROCEED" ng-required="true"> <label for="agentAssistance"><span class="radio sprite"></span> Agent Assistance</label>
+										</div>
+										<div class="radio_wrap">
+											<input type="radio" id="self" name="proceed" value="2" ng-disabled="cdc.isLeadCreated" ng-model="cdc.customerData.PROCEED" ng-required="true"> <label for="self"><span class="radio sprite"></span> Self</label>
+										</div>
+
+										<div ng-messages="cdc.custDetailForm.proceed.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.proceed.$invalid && !cdc.custDetailForm.proceed.$pristine)">
+											<div ng-message="required">Please select any one.</div>
+										</div>
+									</div>
+									<div class="clear"></div>
+									<!-- <div class="wrap" ng-if="cdc.agencyCampaign && cdc.isProceedBtnClicked && cdc.isConsentSelected">
+										<div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12">
+	                                        <div class="smart-wrap pr">
+	                                            <img src = '{{cdc.captchImageBase64String}}'/>
+	                                            <div id="captchaimg" class="captchaImg"  style="background: url({{cdc.captchImageBase64String}});"></div>
+	                                            <a class="refresh-img captcharefresh" ng-disabled="cdc.isLeadCreated" ng-click="cdc.loadCaptch()"></a>
+	                                        </div>
+	                                    </div>
+	                                    <div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12">
+	                                        <div class="smart-wrap pr">
+	                                            <input class="full-width inputText" type="text" ng-disabled="cdc.isLeadCreated" ng-model="cdc.customerData.captcha" name="captcha" required /><span class="floating-label">Captcha<em>*</em></span>
+	                                            <div class="clear"></div>
+	                                            <div ng-messages="cdc.custDetailForm.captcha.$error" class="error-messages" ng-show="invalidleadForm || (cdc.custDetailForm.captcha.$invalid && !cdc.custDetailForm.captcha.$pristine)">
+	                                                <div ng-message="required">Please enter captcha.</div>
+	                                            </div>
+	                                        </div>
+	                                    </div>
+	                                    <div class=" col-lg-12 smart-wrap pr" >
+	                                        <input class="validate blkbtn" type="button" ng-disabled="cdc.isLeadCreated" value="Validate Captcha"  ng-click="cdc.validateCaptcha()" />
+										</div>
+                                    </div> -->
+									<div class="clear"></div>
+									<div class="wrap" ng-if="cdc.isOtpSent && cdc.isProceedBtnClicked" style="margin-top:5%">
+						                         <p>An OTP has been sent to your registered mobile number <strong>{{cdc.otpNumberDisplay}}</strong> at {{cdc.OTPSENDTIME}}</p>
+					 
+						                        <div class="smart-wrap pr">
+						                            <input data-skip-cobrowse class="full-width inputText" ng-maxlength="4" ng-minlength="4" type="text" name="otp" ng-model="cdc.otp" required/>
+						                            <span class="floating-label">{{cdc.otpLabel}}<em>*</em></span>
+						                            <div ng-messages="cdc.custDetailForm.otp.$error" class="error-messages" ng-show="cdc.custDetailForm.otp.$invalid && !cdc.custDetailForm.otp.$pristine">
+						                                 <div ng-message="required">Please Enter OTP</div>
+						                                 <div ng-message="maxlength">Maximum 4 char only.</div>
+						                                 <div ng-message="minlength">Minimum 4 char only.</div>
+						                             </div>
+						                        </div>
+						                        <input class=" blkbtn" type="button" value="Validate" ng-click="cdc.validateOtp()" />
+						                        <p class="margin-bottom-5 margin-top-20">{{counter==0?"":"If you don't receive an OTP, kindly retry in 00:"+counter}} </p>
+						                        <a class="btn_otp refresh-img" ng-click="enableresendotp || cdc.sendOtp()">Resend OTP</a>
+						            </div>
+								  <!-- DBS Camp Flow Code Start  -->
+								  <!-- <div class="wrap" ng-if="cdc.isDBSNewCamp">
+									<input class="full-width inputText" type="text" name="reference" ng-maxlength="20" ng-model="cdc.disclaimerDataDBSCF.REFERENCE_CODE" ng-pattern="cdc.agentCodeRegex" ng-change="cdc.resetvalidation()" />
+									<div class="clear"></div>
+									<div ng-messages="cdc.custDetailForm.reference.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.reference.$invalid && !cdc.custDetailForm.reference.$pristine)">
+										<div ng-message="pattern">Please enter a valid Document code (Do not prepend zero).</div>
+										<div ng-message="maxlength">Maximum 20 characters only.</div>
+									</div>
+								  </div> -->
+								  <!-- DBS Camp Flow Code End -->
+								  
+								</div>
+
+								<div class="col-lg-6 col-sm-6 col-xs-12" ng-if="!cdc.isProceedBtnClicked">
+
+									<!-- Address 1  -->
+									<div class="wrap" ng-if="!cdc.isPASA && !cdc.isCITI">
+										<input type="text" class="inputText full-width" name="add1" id="add1" ng-model="cdc.customerData.CURNT_ADDRESS1" ng-pattern="cdc.revampCRRegex" placeholder="Address 1" ng-maxlength="45" required ng-disabled="cdc.isCitiAPI || cdc.bkycDisabled" /> <span class="floating-label">Address 1<em>*</em></span>
+										<div ng-messages="cdc.custDetailForm.add1.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.add1.$invalid && !cdc.custDetailForm.add1.$pristine)">
+											<div ng-message="maxlength">Maximum 45 chars only.</div>
+											<div ng-message="blockHash">Please do not use '#' or '|'.</div>
+											<div ng-message="pattern">Enter valid Address excluding special characters</div>
+											<div ng-message="required">Address 1 cannot be empty.</div>
+										</div>
+									</div>
+
+
+									<!-- Address 2 -->
+									<div class="wrap" ng-if="!cdc.isPASA && !cdc.isCITI">
+										<input type="text" class="inputText full-width" name="add2" id="add2" ng-model="cdc.customerData.CURNT_ADDRESS2" placeholder="Address 2" ng-pattern="cdc.revampCRRegex" ng-maxlength="45" block-hash ng-disabled="cdc.isCitiAPI || cdc.bkycDisabled" /> <span class="floating-label">Address 2</span>
+
+										<div ng-messages="cdc.custDetailForm.add2.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.add2.$invalid && !cdc.custDetailForm.add2.$pristine)">
+											<div ng-message="maxlength">Maximum 45 chars only.</div>
+											<div ng-message="blockHash">Please do not use '#' or '|'.</div>
+											<div ng-message="pattern">Enter valid Address excluding special characters</div>
+											<div ng-message="required">Address 2 cannot be empty.</div>
+										</div>
+									</div>
+
+
+									<!-- Address 3 -->
+									<div class="wrap" ng-if="!cdc.isPASA && !cdc.isCITI">
+										<input type="text" class="inputText full-width" name="add3" id="add3" ng-model="cdc.customerData.CURNT_ADDRESS3" placeholder="Address 3" ng-pattern="cdc.revampCRRegex" ng-maxlength="45" block-hash ng-disabled="cdc.isCitiAPI || cdc.bkycDisabled" /> <span class="floating-label">Address 3</span>
+
+										<div ng-messages="cdc.custDetailForm.add3.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.add3.$invalid && !cdc.custDetailForm.add3.$pristine)">
+											<div ng-message="maxlength">Maximum 45 chars only.</div>
+											<div ng-message="blockHash">Please do not use '#' or '|'.</div>
+											<div ng-message="pattern">Enter valid Address excluding special characters</div>
+											<div ng-message="required">Address 3 cannot be empty.</div>
+										</div>
+									</div>
+
+									<!--Landmark -->
+									<div class="wrap" ng-if="!cdc.isPASA && !cdc.isCITI">
+										<input type="text" class="inputText full-width" id="landmark" name="landmark" ng-model="cdc.customerData.CURNT_DISTRICT_LANDMARK" placeholder="Landmark" ng-pattern="cdc.revampCRRegex" required ng-maxlength="45" block-hash ng-disabled="cdc.disableLandmark || cdc.bkycDisabled" /> <span class="floating-label">Landmark<em>*</em></span>
+
+										<div ng-messages="cdc.custDetailForm.landmark.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.landmark.$invalid && !cdc.custDetailForm.landmark.$pristine)">
+											<div ng-message="maxlength">Maximum 45 chars only.</div>
+											<div ng-message="blockHash">Please do not use '#' or '|'.</div>
+											<div ng-message="pattern">Enter valid landmark excluding special characters</div>
+											<div ng-message="required">Landmark cannot be empty.</div>
+										</div>
+									</div>
+
+									<!-- Resident Status For Group corporate Non PASA flow -->
+									<!-- NRI Cases CR Start -->
+									<div class="wrap" ng-if="!cdc.isPASA && !cdc.isCITI">
+										<div class="selectwrap">
+											<select name="residentStatus" id="residentStatus" class="sel-opt" required ng-options="option.RESIDENT_STATUS for option in cdc.residentStatusList" ng-model="cdc.resident_status" ng-disabled = "cdc.disableResidentStatus || cdc.bkycDisabled" ng-change="cdc.onResidentStatusChange()">
+											</select> 
+											<span class="floating-label">Resident Status<em>*</em></span>
+											<div ng-messages="cdc.custDetailForm.residentStatus.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.residentStatus.$invalid && !cdc.custDetailForm.residentStatus.$pristine)">
+												<div ng-message="required">Please select a resident status.</div>
+											</div>
+										</div>
+									</div>
+
+									<div class="wrap" ng-if="cdc.resident_status.RESIDENT_STATUS_CODE != 'RI'">
+										<div class="selectwrap">
+											<select name="countryOfRes" id="" class="sel-opt"  ng-options="option.COUNTRY_NAME disable when (option.COUNTRY_NAME == 'INDIA' && (cdc.resident_status.RESIDENT_STATUS_CODE != 'RI' )) for option in cdc.countryList" ng-model="cdc.countryResident" ng-change="cdc.onCountryResidentChange()" required></select> 
+											<span class="floating-label">Country of Residence<em>*</em></span>
+											<div ng-messages="cdc.custDetailForm.countryOfRes.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.countryOfRes.$invalid && !cdc.custDetailForm.countryOfRes.$pristine)">
+												<div ng-message="required">Please select an option.</div>
+											</div>
+										</div>
+									</div>
+
+									<!-- NRI Cases CR End -->
+									<!-- Country For Group corporate Non PASA flow NRI -->
+									<div class="wrap">
+										<div class="selectwrap">
+											<select name="countryNPASA" id="countryNPASA" class="sel-opt" ng-disabled="cdc.bkycDisabled || cdc.disableCountryField" required ng-options="option.COUNTRY_NAME for option in cdc.countryList" ng-model="cdc.country" ng-change="cdc.onCountryChange()">
+											</select> 
+											<span class="floating-label">Country<em>*</em></span>
+											<div ng-messages="cdc.custDetailForm.countryNPASA.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.countryNPASA.$invalid && !cdc.custDetailForm.countryNPASA.$pristine)">
+												<div ng-message="required">Please select a country.</div>
+											</div>
+										</div>
+									</div>
+									
+									<!-- NRI Cases CR Start -->
+									<div class="wrap" ng-if="cdc.customerData.COUNTRY != 'INDIA'">
+										<input type="text" class="inputText full-width" name="state" id="state"  ng-disabled="cdc.bkycDisabled" ng-model="cdc.customerData.CURNT_STATE" placeholder="State" ng-pattern="cdc.freeTxtRegex" ng-maxlength="30" required /> <span class="floating-label">State<em>*</em></span>
+
+										<div ng-messages="cdc.custDetailForm.state.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.state.$invalid && !cdc.custDetailForm.state.$pristine)">
+											<div ng-message="maxlength">Maximum 30 chars only.</div>
+											<div ng-message="blockHash">Please do not use '#' or '|'.</div>
+											<div ng-message="pattern">Enter valid State excluding special characters</div>
+											<div ng-message="required">State cannot be empty.</div>
+										</div>
+									</div>
+									
+									<div class="wrap" ng-if="cdc.customerData.COUNTRY != 'INDIA'">
+										<input type="text" class="inputText full-width" name="city" id="city" ng-disabled="cdc.bkycDisabled" ng-model="cdc.customerData.CURNT_CITY" placeholder="City" ng-pattern="cdc.freeTxtRegex" ng-maxlength="30" required /> <span class="floating-label">City<em>*</em></span>
+
+										<div ng-messages="cdc.custDetailForm.city.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.city.$invalid && !cdc.custDetailForm.city.$pristine)">
+											<div ng-message="maxlength">Maximum 30 chars only.</div>
+											<div ng-message="blockHash">Please do not use '#' or '|'.</div>
+											<div ng-message="pattern">Enter valid City excluding special characters</div>
+											<div ng-message="required">City cannot be empty.</div>
+										</div>
+									</div>
+									<!-- NRI Cases CR End -->
+									
+									<!-- State -->
+									<div class="wrap" ng-if="cdc.customerData.COUNTRY == 'INDIA' && !cdc.isPASA && !cdc.isCITI">
+										<div class="selectwrap">
+											<select name="state" id="state" ng-options="s.STATE_DESC for s in cdc.stateList | filter: { STATE_DESC: $searchTerm } track by s.STATE_CODE" class="sel-opt" ng-model="cdc.stateOptionSelected" ng-change="cdc.onStateChange()" required ng-disabled="cdc.isCitiAPI || cdc.bkycDisabled" ></select> <span class="floating-label">Select State<em>*</em></span>
+											<div ng-messages="cdc.custDetailForm.state.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.state.$invalid && !cdc.custDetailForm.state.$pristine)">
+												<div ng-message="required">Please select a state.</div>
+											</div>
+										</div>
+									</div>
+
+									<!-- City -->
+									<div class="wrap" ng-if="cdc.customerData.COUNTRY == 'INDIA' && !cdc.isPASA && !cdc.isCITI">
+										<div class="selectwrap">
+											<select name="city" id="city" ng-options="s.CITY_DESC disable when (s.CITY_CODE == null) for s in cdc.cityList | filter: { CITY_DESC: $searchTerm } track by s.CITY_CODE" class="sel-opt" ng-model="cdc.cityOptionSelected" ng-change="cdc.onCityChange()" required ng-disabled="cdc.isCitiAPI || cdc.bkycDisabled" ></select> <span class="floating-label">Select City<em>*</em></span>
+											<div ng-messages="cdc.custDetailForm.city.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.city.$invalid && !cdc.custDetailForm.city.$pristine)">
+												<div ng-message="required">Please select a city.</div>
+											</div>
+										</div>
+									</div>
+
+									<!-- Other city -->
+									<div class="wrap" ng-show="cdc.cityOptionSelected.CITY_DESC=='Others'">
+										<input type="text" class="inputText full-width" name="cityOther" id="cityOther" ng-disabled="cdc.bkycDisabled" ng-model="cdc.cityOther" ng-maxlength="30" ng-required="cdc.cityOptionSelected.CITY_DESC=='Others'" ng-pattern="cdc.freeTxtRegex" block-hash> <span class="floating-label">Other City<em>*</em></span>
+										<div ng-messages="cdc.custDetailForm.cityOther.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.cityOther.$invalid && !cdc.custDetailForm.cityOther.$pristine)">
+											<div ng-message="required">Please enter city name.</div>
+											<div ng-message="blockHash">Please do not use '#' or '|'.</div>
+											<div ng-message="pattern">Enter valid city name excluding special characters</div>
+											<div ng-message="maxlength">Maximum 30 char only.</div>
+										</div>
+									</div>
+
+									<!-- Zip -->
+									<!-- NRI Cases CR Start -->
+									<div class="wrap" ng-if="!cdc.FLOW_HSEC && !cdc.isPASA && !cdc.isCBI && !cdc.isCITI">
+										<input type="number" class="inputText full-width" name="zip" id="zip" ng-model="cdc.customerData.CURNT_ZIP_CODE" placeholder="Zip" ng-pattern="cdc.zipcodeRegex" ng-minlength="6" validate-pincode="cdc.stateOptionSelected.STATE_DESC" ng-maxlength="{{cdc.maxValue}}" required ng-if="cdc.customerData.COUNTRY == 'INDIA'" ng-disabled="cdc.isCitiAPI || cdc.bkycDisabled" />
+										<input type="text" class="inputText full-width" name="zip" ng-disabled="cdc.bkycDisabled" ng-model="cdc.customerData.CURNT_ZIP_CODE" placeholder="Zip" ng-pattern="cdc.zipcodeRegex" ng-minlength="1" ng-maxlength="{{cdc.maxValue}}" required ng-if="cdc.customerData.COUNTRY != 'INDIA'" /> <span class="floating-label">Zip<em>*</em></span>
+										<div ng-messages="cdc.custDetailForm.zip.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.zip.$invalid && !cdc.custDetailForm.zip.$pristine)">
+											<div ng-message="required">Please enter a Zip Code.</div>
+											<div ng-message="maxlength">Maximum {{cdc.maxValue}} chars only.</div>
+											<div ng-message="pattern">Please enter a valid Zip Code.</div>
+											<div ng-message="minlength">Pincode should be minimum 6 digits.</div>
+											<span ng-message="validatePincode">Your address (Pincode and State) is not valid.</span>
+										</div>
+									</div>
+									<div class="wrap" ng-if="cdc.isCBI">
+										<input type="number" class="inputText full-width" name="zip" id="zip" ng-disabled="cdc.bkycDisabled" ng-model="cdc.customerData.CURNT_ZIP_CODE" placeholder="Pin Code" ng-pattern="cdc.zipcodeRegex" ng-minlength="6" validate-pincode="cdc.stateOptionSelected.STATE_DESC" ng-maxlength="{{cdc.maxValue}}" required ng-if="cdc.customerData.COUNTRY == 'INDIA'" />
+										<input type="text" class="inputText full-width" name="zip" ng-disabled="cdc.bkycDisabled" ng-model="cdc.customerData.CURNT_ZIP_CODE" placeholder="Pin Code" ng-pattern="cdc.zipcodeRegex" ng-minlength="1" ng-maxlength="{{cdc.maxValue}}" required ng-if="cdc.customerData.COUNTRY != 'INDIA'" /> <span class="floating-label">Pin Code<em>*</em></span>
+										<div ng-messages="cdc.custDetailForm.zip.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.zip.$invalid && !cdc.custDetailForm.zip.$pristine)">
+											<div ng-message="required">Please enter a Pin Code.</div>
+											<div ng-message="maxlength">Maximum {{cdc.maxValue}} chars only.</div>
+											<div ng-message="pattern">Please enter a valid Pin Code.</div>
+											<div ng-message="minlength">Pin Code should be minimum 6 digits.</div>
+											<span ng-message="validatePincode">Your address (Pin Code and State) is not valid.</span>
+										</div>
+									</div>
+									<!-- Product Pitched -->
+									<div class="wrap" ng-if="cdc.isCBI">
+										<div class="selectwrap">
+											<select name="productPitched" id="productPitched" ng-disabled="cdc.bkycDisabled" ng-options="option.PRODUCT_NAME as option.PRODUCT_NAME for option in cdc.productList" class="sel-opt" ng-model="cdc.customerData.PRODUCT_PITCHED" required></select> <span class="floating-label">Product Pitched<em>*</em></span>
+											<div ng-messages="cdc.custDetailForm.productPitched.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.productPitched.$invalid && !cdc.custDetailForm.productPitched.$pristine)">
+												<div ng-message="required">Please select a Product Pitched.</div>
+											</div>
+										</div>
+									</div>
+									<!-- NRI Cases CR End -->
+								</div>
+								
+								<!-- DBS Camp Flow Code Start -->
+								<div class="col-lg-12 col-sm-12 col-xs-12" ng-if="cdc.isDBSNewCamp">
+									<div class="wrap">
+										<h5 class="bold">I hereby declare that:</h5>
+										<p class="margin-bottom-5 margin-top-20">
+											<input type="checkbox" id="agreeDBSNewCamp" name="agreeDBSNewCamp" id="agreeDBSNewCamp" value="Y" required ng-model="cdc.disclaimerDataDBSCF.agree"><label for="agreeDBSNewCamp"><span class="check sprite"></span></label> I am purchasing the TATA AIA product on my own.
+										</p>
+										<div class="clear"></div>
+										<div ng-messages="cdc.custDetailForm.agreeDBSNewCamp.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.agreeDBSNewCamp.$invalid && !cdc.custDetailForm.agreeDBSNewCamp.$pristine)">
+											<div ng-message="required">Please select disclaimer</div>
+										</div>
+										<div class="clear"></div>
+										<p class="margin-bottom-5 margin-top-20">
+											<input type="checkbox" id="agree1DBSNewCamp" name="agree1DBSNewCamp" id="agree1DBSNewCamp" value="Y" required ng-model="cdc.disclaimerDataDBSCF.agree1"><label for="agree1DBSNewCamp"><span class="check sprite"></span></label> I am authorizing DBS bank to share my KYC & AML documents for the purpose of completion of this application.
+										</p>
+										<div ng-messages="cdc.custDetailForm.agree1DBSNewCamp.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.agree1DBSNewCamp.$invalid && !cdc.custDetailForm.agree1DBSNewCamp.$pristine)">
+											<div ng-message="required">Please select disclaimer</div>
+										</div>
+										<div class="clear"></div>
+									</div>
+								</div>
+								<!-- DBS Camp Flow Code Ends -->
+								
+								<div class="clear"></div>
+								<div class="container {{cdc.isPASA ? 'makeInputCenter' : ''}}" ng-hide="hideNextButton">
+									<div class="wrap clearfix top-btn">
+										<!-- GC code starts  -->
+										<input class="blkbtn next-slide fl" ng-show="!cdc.agencyCampaign" type="button"  id="submit" name="submit" value="Submit" ng-click="cdc.isKYCEnabled ? cdc.checkOKYCAddress() : cdc.onNext(cdc.custDetailForm)"/> 
+										<input href="#disclaimer" id="disclaimer" name="disclaimer" class="blkbtn fancy fl" type="button" style="display: none;" /> 
+										<input href="#disclaimerSR" id="disclaimerSR" name="disclaimerSR" class="blkbtn fancy232 fl" type="button" style="display: none;" />
+										<input href="#disclaimerSRP" id="disclaimerSRP" name="disclaimerSRP"  class="blkbtn fancy233 fl" type="button" style="display: none;" />
+										<input href="#disclaimerSIP" id="disclaimerSIP" name="disclaimerSIP" class="blkbtn fancy240 fl" type="button" style="display: none;" />
+										<input href="#disclaimerGIP" id="disclaimerGIP" name="disclaimerGIP" class="blkbtn fancy226 fl" type="button" style="display: none;" />
+										<input href="#disclaimerDSP" id="disclaimerDSP" name="disclaimerDSP" class="blkbtn fancy238 fl" type="button" style="display: none;" />
+										<input href="#disclaimerFP" id="disclaimerFP" name="disclaimerFP" class="blkbtn fancy228 fl" type="button" style="display: none;" />
+										<input href="#disclaimerGCSumAssured" id="disclaimerGCSumAssured" name="disclaimerGCSumAssured" class="blkbtn fancyGCSumAssured fl" type="button" style="display: none;" />
+										<input href="#disclaimerGCCompany" id="disclaimerGCCompany" name="disclaimerGCCompany" class="blkbtn fancyGCCompany fl" type="button"
+											style="display: none;" />
+										<input href="#disclaimerGC" id="disclaimerGC" name="disclaimerGC" class="blkbtn fancyGC fl" type="button" style="display: none;" />
+										<input href="#disclaimerGCAuth" id="disclaimerGCAuth" name="disclaimerGCAuth" class="blkbtn disclaimerGCAuth fl" type="button" style="display: none;" />
+										<input href="#disclaimerTR"  id="disclaimerTR" name="disclaimerTR" class="blkbtn fancyTR fl" type="button" style="display: none;" />
+										<input class="blkbtn next-slide fl" ng-show="cdc.isLeadCreated && cdc.isValid" type="button" value="Update" ng-click="cdc.updateLeadData(cdc.custDetailForm)"/>
+										<!-- GC code ends -->
+									</div>
+								</div>
+								<!-- DBS Camp Flow Code Start -->
+								<div class="col-lg-12 col-sm-12 col-xs-12" ng-if="cdc.isDBSNewCamp">
+									<div class="wrap">
+											<p>&nbsp;</p>
+											<ul class="starbull">
+												<li>Insurance cover is available under this product</li>
+												<li>Riders are not mandatory and is available for a nominal extra cost. For more details on benefits, premiums and exclusions under the Riders, please contact Tata AIA Life's Insurance Advisor/ branch</li>
+												<li>This product is underwritten by Tata AIA Life Insurance Company Ltd. This plan is not a guaranteed issuance plan and it will be subject to Company's underwriting and acceptance.</li>
+												<li>Buying a Life Insurance policy is a long-term commitment. An early termination of the policy usually involves high costs and the Surrender Value payable may be less than all the Premiums Paid.</li>
+												<li>In case of Sub Standard lives, extra premiums will be charged as per our underwriting guidelines</li>
+												<li>Income Tax benefits would be available as per the prevailing income tax laws, subject to fulfillment of conditions stipulated therein. Tata AIA Life Insurance Company Ltd. does not assume responsibility on tax implication mentioned anywhere on this site. Please consult your own tax consultant to know the tax benefits available to you.</li>
+												<li>For more details on risk factors, terms and conditions please read sales brochure carefully before concluding a sale</li>
+											</ul>
+											<p>
+												For any information including cancellation, claims and complaints, please contact our Insurance Advisor or visit Tata AIA Life's nearest branch office or call 1-860-266-9966 (local charges apply) or write to us at <a href="mailto:customercare@tataaia.com">customercare@tataaia.com</a>.
+											</p>
+											<p>Tata AIA Life Insurance Company Ltd. (IRDA of India Regn. No.110) CIN No. U66010MH2000PLC128403 Registered & Corporate Office: 14th Floor, Tower A, Peninsula Business Park, Senapati Bapat Marg, Lower Parel, Mumbai - 400013</p>
+											<div class="disc_box_cont">
+												<h4>BEWARE OF SPURIOUS PHONE CALLS AND FICTITIOUS/FRAUDULENT OFFERS</h4>
+												<p>IRDA of India clarifies to public that</p>
+												<ul>
+													<li>IRDA of India or its officials do not involve in activities like sale of any kind of insurance or financial products nor invest premiums.</li>
+													<li>IRDA of India does not announce any bonus. Public receiving such phone calls are requested to lodge a police complaint along with details of phone call, number.</li>
+												</ul>
+											</div>
+										</div>
+								</div>
+								<!-- DBS Camp Flow Code Ends -->
+							</form>
+						</div>
+					</div>
+					<div id="st_accordion" class="acc pinkAcco" ng-show="cdc.isIBLCIFCampaign">
+						<div class="investment active" style="display: block">
+							<form name="cdc.custDetailFormIBLCIF" id="cdc.custDetailForm" novalidate>
+								<div class=" {{cdc.isPASA ? 'col-lg-12 col-sm-12 col-xs-12 makeInputCenter' : 'col-lg-6 col-sm-6 col-xs-12'}}">
+								
+									<!-- First Name -->
+									<div class="wrap">
+										<input type="text" class="inputText full-width" placeholder="First Name" name="firstName" ng-model="cdc.customerData.FIRST_NAME" ng-change="cdc.customerData.FIRST_NAME = cdc.customerData.FIRST_NAME.toUpperCase();firstlastnamecheck();"ng-maxlength="20" ng-pattern="cdc.nameRegex" required />
+										<span class="floating-label">First Name<em>*</em></span>
+										<div ng-messages="cdc.custDetailForm.firstName.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.firstName.$invalid && !cdc.custDetailForm.firstName.$pristine)">
+											<div ng-message="required">First name cannot be empty.</div>
+											<div ng-message="pattern">Please use text and ' or - only.</div>
+											<div ng-message="maxlength">Maximum 20 char only.</div>
+										</div>
+									</div>
+									
+									<!-- Middle Name -->
+									<div class="wrap">
+										<input type="text" class="inputText full-width" name="middleName" ng-model="cdc.customerData.MIDDLE_NAME" placeholder="Middle Name" ng-maxlength="18" ng-pattern="cdc.middleNameRegex" />
+										<span class="floating-label">Middle Name</span>
+										<div ng-messages="cdc.custDetailForm.middleName.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.middleName.$invalid && !cdc.custDetailForm.middleName.$pristine)">
+											<div ng-message="required">Middle name cannot be empty.</div>
+											<div ng-message="pattern">Please use text and ', space or - only.</div>
+											<div ng-message="maxlength">Maximum 18 char only.</div>
+										</div>
+									</div>
+
+									<!-- Last Name -->
+									<div class="wrap">
+										<input type="text" class="inputText full-width" name="lastName" ng-model="cdc.customerData.LAST_NAME" placeholder="Last Name" ng-change="cdc.customerData.LAST_NAME = cdc.customerData.LAST_NAME.toUpperCase();firstlastnamecheck();"ng-maxlength="20" ng-pattern="cdc.nameRegex" required />
+										<span class="floating-label">Last Name<em>*</em></span>
+										<div ng-messages="cdc.custDetailForm.lastName.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.lastName.$invalid && !cdc.custDetailForm.lastName.$pristine)">
+											<div ng-message="required">Last name cannot be empty.</div>
+											<div ng-message="pattern">Please use text and ' or - only.</div>
+											<div ng-message="maxlength">Maximum 20 char only.</div>
+										</div>
+									</div>
+									
+									<!-- DOB -->
+									<div class="wrap col-lg-12 col-md-12 col-sm-12 col-xs-12 nopadding">
+										<p class="input-group so-dt-pckr-wrapper">
+											<input name="dob" type="text" ng-paste="$event.preventDefault();" placeholder="Date of Birth (DD-MM-YYYY)" class="form-control so-date-picker" uib-datepicker-popup="{{cdc.format}}" is-open="cdc.dobDatePopup.opened" datepicker-options="cdc.dobDateOptions" close-text="Close" ng-model="cdc.dob" ng-change="cdc.onDOBChange()" age-less-than-18-check required /> <span class="input-group-btn">
+												<button type="button" class="btn btn-default so-dt-pckr-btn" ng-click="cdc.openDatePicker('dobDatePopup')">
+													<i class="glyphicon glyphicon-calendar"></i>
+												</button>
+											</span>
+										</p>
+										<div style="margin: 5px;">
+											<b>Date format: DD-MM-YYYY</b>
+										</div>
+										<div ng-show="invalidleadForm || (cdc.custDetailForm.dob.$invalid && !cdc.custDetailForm.dob.$pristine)" ng-messages="cdc.custDetailForm.dob.$error" class="error-messages invalid">
+											<div ng-message="required">Please enter a date.</div>
+											<div ng-message="date">Please enter a valid date.</div>
+											<div ng-message="minAge">Age should be at least 18 years.</div>
+										</div>
+									</div>
+
+									<!-- Mobile Number -->
+									<div class="wrap">
+										<input type="text" class="inputText full-width" name="mobile" ng-model="cdc.customerData.MOBILE_NO" placeholder="Mobile Number" ng-pattern="cdc.mobileRegex" required />
+										<span class="floating-label">Mobile Number<em>*</em></span>
+										<div ng-messages="cdc.custDetailForm.mobile.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.mobile.$invalid && !cdc.custDetailForm.mobile.$pristine)">
+											<div ng-message="required">Mobile number cannot be empty.</div>
+											<div ng-message="pattern">{{cdc.MOBILE_PATTERN_MSG}}</div>
+										</div>
+									</div>
+									
+									<!-- Bank Account No -->
+									<div class="wrap">
+										<input type="text" class="inputText full-width" placeholder="Bank Account Number" name="bankAccountNo" ng-maxlength="12" ng-minlength="12" ng-pattern="cdc.numberRegex" ng-model="cdc.customerData.BANK_RELATIONSHIP_NO" required />
+										<span class="floating-label">Bank Account Number<em>*</em></span>
+										<div ng-messages="cdc.custDetailForm.bankAccountNo.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.bankAccountNo.$invalid && !cdc.custDetailForm.bankAccountNo.$pristine)">
+											<div ng-message="required">Bank Account No cannot be empty.</div>
+											<div ng-message="pattern">Please enter digits only.</div>
+											<div ng-message="maxlength">Bank Account No should be of 12 digits.</div>
+											<div ng-message="minlength">Bank Account No should be of 12 digits.</div>
+										</div>
+									</div>
+									
+									<!-- <div class="wrap">
+										<h5 class="bold">I hereby declare that:</h5>
+										<p class="margin-bottom-5 margin-top-20">
+											<input type="checkbox" name="cifagree" id="cifagree" value="Y" required ng-model="cdc.disclaimerDataIBLCIF.agree"><label for="cifagree"><span class="check sprite"></span></label> I am purchasing the TATA AIA product on my own.
+										</p>
+										<div class="clear"></div>
+										<div ng-messages="cdc.custDetailForm.cifagree.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.cifagree.$invalid && !cdc.custDetailForm.cifagree.$pristine)">
+											<div ng-message="required">Please select disclaimer</div>
+										</div>
+										<div class="clear"></div>
+										<p class="margin-bottom-5 margin-top-20">
+											<input type="checkbox" name="cifagree1" id="cifagree1" value="Y" required ng-model="cdc.disclaimerDataIBLCIF.agree1"><label for="cifagree1"><span class="check sprite"></span></label> I hereby authorize IndusInd bank Ltd to share my KYC details with Tata AIA Life Insurance Company Ltd. for the purpose of completing this insurance application.
+										</p>
+										<div ng-messages="cdc.custDetailForm.cifagree1.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.cifagree1.$invalid && !cdc.custDetailForm.cifagree1.$pristine)">
+											<div ng-message="required">Please select disclaimer</div>
+										</div>
+										<div class="clear"></div>
+									</div> -->
+									
+									<!-- Captcha HTML -->
+									<div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12">
+										<div class="smart-wrap pr">
+											<div id="captchaimg" class="captchaImg"  style="background: url({{cdc.captchImageBase64String}});"></div>
+											<a class="refresh-img captcharefresh" ng-click="cdc.loadcaptchIBLCIF()"></a>
+										</div>
+									</div>
+									<div class="margin-top-20 col-lg-6 col-sm-6 col-xs-12">
+										<div class="smart-wrap pr">
+											<input class="full-width inputText" type="text" ng-model="cdc.custDetailForm.IBL.captcha" name="captcha" required ng-disabled="cdc.captchaMatchedIBL" /><span class="floating-label">Captcha<em>*</em></span>
+											<div class="clear"></div>
+											<div ng-messages="cdc.custDetailFormIBLCIF.captcha.$error" class="error-messages" ng-show="invalidForm || (cdc.custDetailFormIBLCIF.captcha.$invalid && !cdc.custDetailFormIBLCIF.captcha.$pristine)">
+												<div ng-message="required">Please enter captcha.</div>
+											</div>
+										</div>
+									</div>
+									
+									<!-- validate captcha button -->
+									<div class="clear"></div>
+									<div class="wrap">
+										<div class="wrap clearfix top-btn">
+											<input class="blkbtn" type="button" value="Validate Captcha" ng-click="cdc.validateCaptchaIBLCIF()" ng-disabled="cdc.captchaMatchedIBL"/>
+											<input href="#otpIBLCIF" class="blkbtn otpIBLCIF fl" type="button" ng-hide="true" />
+										</div>
+									</div>
+									
+									<!-- OTP Text -->
+									<p ng-if="cdc.captchaMatchedIBL">An OTP has been sent to your registered mobile number <strong>{{cdc.otpNumberDisplay}}</strong> at {{cdc.OTPSENDTIME}}. 
+                         			This verification code/OTP once entered shall be considered as your consent to seek your KYC details from IndusInd Bank for the purpose of 
+                         			completion of insurance application with TATA AIA Life Insurance Co Ltd.</p>
+                         			
+                         			<!-- OTP Text box -->
+									<div class="wrap" ng-if="cdc.captchaMatchedIBL">
+										<input type="text" class="inputText full-width" name="otp" ng-maxlength="4" ng-minlength="4" ng-model="cdc.otp" required />
+										<span class="floating-label">OTP<em>*</em></span>
+										<div ng-messages="cdc.custDetailForm.otp.$error" class="error-messages invalid" ng-show="invalidleadForm || (cdc.custDetailForm.otp.$invalid && !cdc.custDetailForm.otp.$pristine)">
+											<div ng-message="required">Please Enter OTP</div>
+											<div ng-message="maxlength">Maximum 4 char only.</div>
+											<div ng-message="minlength">Minimum 4 char only.</div>
+										</div>
+									</div>
+									<div class="clear"></div>
+									
+									<!-- Validate OTP button -->
+									<div class="wrap" ng-if="cdc.captchaMatchedIBL">
+										<div class="wrap clearfix top-btn">
+											<input class="blkbtn" type="button" value="Validate OTP" ng-click="cdc.validateOtpCIF()"/>
+											<p class="margin-bottom-5 margin-top-20">{{counter==0?"":"If you donâ€™t receive an OTP, kindly retry in 00:"+counter}} </p>
+                        					<a class="btn_otp refresh-img" ng-click="enableresendotp || cdc.sendOtpCIF()">Resend OTP</a>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- OKYC : Submission Redirection to Aadhar Website-->
+	<form id="okycForm" method="POST">
+        <input type="hidden" id="WEBAPI_REQUEST_DATA" name="WEBAPI_REQUEST_DATA">
+    </form>
+</section>
+<footer-component></footer-component>
