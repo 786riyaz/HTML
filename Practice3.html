@@ -7,13 +7,41 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Practice 3 - RK</title>
+    <style>
+        /* internal CSS */
+        /* Selector {Property : Value} */
+        h2 {
+            color: whitesmoke;
+            font-style: oblique;
+        }
+
+        h2:hover {
+            background-color: white;
+            color: black
+        }
+
+        details {
+            background-color: yellow;
+            display: inline;
+        }
+
+        /* div {
+            background-color: green;
+        } */
+
+        /* #name {} */
+    </style>
+    <link rel="stylesheet" href="Practice3.css">
 </head>
 
 <body>
     <center>
         <h2>Admission Form</h2>
         <details>
-            <summary>This is Summary Semantic</summary>
+            <summary style="color:red;font-size:x-large">
+                <!-- inline CSS -->
+                This is Summary Semantic
+            </summary>
             <summary>This is a deteils tab created using HTML Semantic &lt;details&gt;</summary>
             Lorem ipsum, dolor sit amet consectetur adipisicing elit. Enim quam suscipit nam temporibus nesciunt
             adipisci mollitia quo tempore eius incidunt, exercitationem distinctio voluptatum obcaecati nostrum eos ad!
@@ -72,8 +100,8 @@
             </div>
             <div>
                 <br>
-                <input type="submit" value="Submit">
-                <input type="reset" value="Reset">
+                <input type="submit" value="Submit" class="btn">
+                <input type="reset" value="Reset" class="btn">
             </div>
         </form>
     </center>
