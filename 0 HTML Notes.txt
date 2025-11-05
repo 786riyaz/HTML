@@ -1,0 +1,2 @@
+input types 
+    text, range, number
